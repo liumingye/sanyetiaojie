@@ -25,7 +25,7 @@ export default {
     return {
        /*表单数据对象*/
       form: {
-        category_id: 0,
+        cid: 0,
         name: '',
         sort: ''
       },
@@ -61,11 +61,11 @@ export default {
   props: ['open_edit', 'editform'],
   created() {
     this.dialogVisible = this.open_edit;
-    this.form.category_id = this.editform.model.category_id;
+    this.form.cid = this.editform.model.cid;
     this.form.parent_id = this.editform.model.parent_id;
     this.form.name = this.editform.model.name;
     this.form.sort = this.editform.model.sort;
-    this.getImage(this.editform.model.category_id);
+    this.getImage(this.editform.model.cid);
   },
   methods: {
     /*修改用户*/

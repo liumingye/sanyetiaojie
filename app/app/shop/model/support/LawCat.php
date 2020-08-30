@@ -34,14 +34,13 @@ class LawCat extends CategoryModel
     public function edit($data)
     {
         $this->deleteCache();
-        !array_key_exists('image_id', $data) && $data['image_id'] = 0;
         return $this->save($data) !== false;
     }
 
     /**
      * 删除商品分类
      */
-    public function remove($categoryId)
+    public function remove()
     {
         $this->deleteCache();
         return $this->delete();
@@ -52,7 +51,7 @@ class LawCat extends CategoryModel
      */
     private function deleteCache()
     {
-        return Cache::delete('category_' . static::$app_id);
+        return Cache::delete('lawcat_' . static::$app_id);
     }
 
 }

@@ -18,7 +18,7 @@ class Law extends LawModel
 
     public function getBaseData()
     {
-        $category = (new CategoryModel)->getCacheTreeSimple();
+        $category = (new CategoryModel)->getCacheTreeSimple(false);
         return compact('category');
 
     }

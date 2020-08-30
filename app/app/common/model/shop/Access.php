@@ -21,4 +21,11 @@ class Access extends BaseModel
         $data = static::withoutGlobalScope()->where(['is_show' => 1])->order(['sort' => 'asc', 'create_time' => 'asc'])->select();
         return $data ? $data->toArray() : [];
     }
+
+    protected static function UserRole()
+    {
+        $data = static::withoutGlobalScope()->where(['is_show' => 1])->order(['sort' => 'asc', 'create_time' => 'asc'])->select();
+        return $data ? $data->toArray() : [];
+    }
+
 }

@@ -21,6 +21,7 @@ class Cases extends Controller
             'category_id' => $cid,
             'text' => $text,
             'page' => $page,
+            'list_rows' => 10,
             'field' => 'id,category_id,title,create_time',
             'status' => 1
         ]);
@@ -37,7 +38,7 @@ class Cases extends Controller
     }
 
     /**
-     * 添加法律
+     * 添加案例
      */
     public function add()
     {
@@ -55,7 +56,7 @@ class Cases extends Controller
     }
 
     /**
-     * 编辑法律
+     * 编辑案例
      */
     public function edit($id)
     {
@@ -69,7 +70,7 @@ class Cases extends Controller
     }
 
     /**
-     * 删除法律
+     * 删除案例
      */
     public function delete($id)
     {
@@ -81,7 +82,7 @@ class Cases extends Controller
     }
     
     /**
-     * 法律详情
+     * 案例详情
      */
     public function info(){
         $id = input('id', 0, 'intval');

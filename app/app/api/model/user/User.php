@@ -33,7 +33,7 @@ class User extends UserModel
     public static function getUser($token)
     {
         $userId = Cache::get($token);
-        return self::where(['user_id' => $userId])->with(['address', 'addressDefault'])->find();
+        return self::where(['user_id' => $userId])->find();
     }
 
     /**
@@ -47,12 +47,35 @@ class User extends UserModel
         // 自动注册用户
         $userInfo = json_decode(htmlspecialchars_decode($post['user_info']), true);
 
-        $user_id = $this->register($session['openid'], $userInfo);
+        $user_id = $this->register($session['openid'], $userInfo, $session['session_key']);
         // 生成token (session3rd)
         $this->token = $this->token($session['openid']);
         // 记录缓存, 7天
         Cache::tag('cache')->set($this->token, $user_id, 86400 * 7);
         return $user_id;
+    }
+
+    /**
+     * 获取手机号
+     */
+    public function getPhone($post)
+    {
+        // 微信登录 获取session_key
+        $app = AppWx::getApp();
+        $user = $this->getUser($post['token']);
+        $decryptedData = $app->encryptor->decryptData($user['session_key'], $post['iv'], $post['encryptedData']);
+        try {
+            $this->startTrans();
+            $this->save([
+                'user_id' => $user['user_id'],
+                'mobile' => $decryptedData['data']['phoneNumber'],
+                'app_id' => self::$app_id
+            ]);
+            $this->commit();
+        } catch (\Exception $e) {
+        }
+
+        return $decryptedData;
     }
 
     /**
@@ -82,12 +105,12 @@ class User extends UserModel
     /**
      * 自动注册用户
      */
-    private function register($open_id, $data)
+    private function register($open_id, $data, $session_key = '')
     {
-        $user = self::detail(['open_id' => $open_id])?:$this;
-        if($user){
+        $user = self::detail(['open_id' => $open_id]) ?: $this;
+        if ($user) {
             $model = $user;
-        }else{
+        } else {
             $model = $this;
             $data['reg_source'] = 'wx';
         }
@@ -96,9 +119,9 @@ class User extends UserModel
             // 保存/更新用户记录
             if (!$model->save(array_merge($data, [
                 'open_id' => $open_id,
+                'session_key' => $session_key,
                 'app_id' => self::$app_id
-            ]))
-            ) {
+            ]))) {
                 throw new BaseException(['msg' => '用户注册失败']);
             }
             $this->commit();
@@ -108,5 +131,4 @@ class User extends UserModel
         }
         return $model['user_id'];
     }
-
 }

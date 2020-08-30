@@ -13,13 +13,21 @@ class CasesCat extends BaseModel
     protected $pk = 'category_id';
 
     /**
+     * 分类详情
+     */
+    public static function detail($category_id)
+    {
+        return self::find($category_id);
+    }
+
+    /**
      * 获取所有分类(树状结构)
      */
     public static function getCacheTreeSimple()
     {
         $model = new static;
         if (!Cache::get('casescat_' . $model::$app_id)) {
-            $data = $model->order(['sort' => 'asc', 'create_time' => 'desc'])->select();
+            $data = $model->field('category_id as cid,name,sort,create_time')->order(['sort' => 'asc', 'create_time' => 'desc'])->select();
             $all = !empty($data) ? $data->toArray() : [];
             Cache::tag('cache')->set('casescat_' . $model::$app_id, compact('all'));
         }

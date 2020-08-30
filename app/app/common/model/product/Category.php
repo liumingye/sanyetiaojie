@@ -88,30 +88,11 @@ class Category extends BaseModel
     {
         $model = new static;
         if (!Cache::get('category_' . $model::$app_id)) {
-            $data = $model->field('category_id,name,text,parent_id')->order(['sort' => 'asc', 'create_time' => 'asc'])->select();
+            $data = $model->field('category_id,name,text')->order(['sort' => 'asc', 'create_time' => 'asc'])->select();
             $all = !empty($data) ? $data->toArray() : [];
-            $tree = [];
-            foreach ($all as $first) {
-                if ($first['parent_id'] != 0) continue;
-                $twoTree = [];
-                foreach ($all as $two) {
-                    if ($two['parent_id'] != $first['category_id']) continue;
-                    $threeTree = [];
-                    foreach ($all as $three)
-                        $three['parent_id'] == $two['category_id']
-                            && $threeTree[$three['category_id']] = $three;
-                    !empty($threeTree) && $two['child'] = $threeTree;
-                    array_push($twoTree, $two);
-                }
-                if (!empty($twoTree)) {
-                    array_multisort(array_column($twoTree, 'sort'), SORT_ASC, $twoTree);
-                    $first['child'] = $twoTree;
-                }
-                array_push($tree, $first);
-            }
-            Cache::tag('cache')->set('category_' . $model::$app_id, compact('all', 'tree'));
+            Cache::tag('cache')->set('category_' . $model::$app_id, compact('all'));
         }
-        return Cache::get('category_' . $model::$app_id)['tree'];
+        return Cache::get('category_' . $model::$app_id)['all'];
     }
 
     /**

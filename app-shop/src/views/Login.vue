@@ -40,6 +40,7 @@
               v-model="ruleForm.checkPass"
               auto-complete="off"
               placeholder="请输入密码"
+              show-password
             />
           </el-form-item>
           <!--登录-->
@@ -201,6 +202,11 @@ export default {
     border: 0;
     caret-color: #606266;
     border: none;
+    
+  }
+  .el-form-item /deep/ .el-input__suffix{
+    right: 10px;
+    top: 1px;
   }
 }
 </style>

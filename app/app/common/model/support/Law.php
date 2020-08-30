@@ -30,8 +30,7 @@ class Law extends BaseModel
         if ($params['text'] != '') {
             $params['text'] = "%{$params['text']}%";
             $model = $model
-                ->where('title', 'like', $params['text'])
-                ->where('text', 'like', $params['text']);
+                ->where('title', 'like', $params['text']);
         }
 
         $list = $model

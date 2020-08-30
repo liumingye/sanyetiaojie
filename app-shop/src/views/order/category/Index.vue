@@ -1,9 +1,4 @@
 <template>
-  <!--
-    	作者：wangxw
-    	时间：2019-10-26
-    	描述：产品分类管理
-    -->
   <div class="product">
     <!--添加分类-->
     <div class="common-level-rail">
@@ -14,13 +9,9 @@
     <!--内容-->
     <div class="product-content">
       <div class="table-wrap">
-        <el-table size="mini" :data="tableData" row-key="category_id" default-expand-all :tree-props="{ children: 'child' }" style="width: 100%">
+        <el-table size="mini" :data="tableData" row-key="category_id" border default-expand-all :tree-props="{ children: 'child' }" style="width: 100%">
+          <el-table-column prop="category_id" label="ID" width="100"></el-table-column>
           <el-table-column prop="name" label="分类名称" width="300"></el-table-column>
-          <!-- <el-table-column prop="" label="图片" width="180">
-            <template slot-scope="scope">
-              <img class="category-photo" v-img-url="hasImages(scope.row.images)" alt="" />
-            </template>
-          </el-table-column> -->
           <el-table-column prop="sort" label="分类排序"></el-table-column>
           <el-table-column prop="create_time" label="添加时间"></el-table-column>
           <el-table-column fixed="right" label="操作" width="100">

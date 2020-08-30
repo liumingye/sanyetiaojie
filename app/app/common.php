@@ -1,8 +1,7 @@
 <?php
 
-use think\facade\Request;
 use think\facade\Log;
-
+use think\facade\Request;
 
 // 应用公共文件
 /**
@@ -26,7 +25,10 @@ function pre($content, $is_die = true)
 function substr_cut($value)
 {
     $strlen = mb_strlen($value, 'utf-8');
-    if ($strlen <= 1) return $value;
+    if ($strlen <= 1) {
+        return $value;
+    }
+
     $firstStr = mb_substr($value, 0, 1, 'utf-8');
     $lastStr = mb_substr($value, -1, 1, 'utf-8');
     return $strlen == 2 ? $firstStr . str_repeat('*', $strlen - 1) : $firstStr . str_repeat("*", $strlen - 2) . $lastStr;
@@ -160,7 +162,7 @@ function export_excel($fileName, $tileArray = [], $dataArray = [])
     header("Content-Type: text/csv");
     header("Content-Disposition:filename=" . $fileName);
     $fp = fopen('php://output', 'w');
-    fwrite($fp, chr(0xEF) . chr(0xBB) . chr(0xBF));// 转码 防止乱码(比如微信昵称)
+    fwrite($fp, chr(0xEF) . chr(0xBB) . chr(0xBF)); // 转码 防止乱码(比如微信昵称)
     fputcsv($fp, $tileArray);
     $index = 0;
     foreach ($dataArray as $item) {
@@ -226,7 +228,6 @@ function filter_emoji($text)
     return preg_replace('/[\xf0-\xf7].{3}/', '', $text);
 }
 
-
 /**
  * 获取全局唯一标识符
  * @param bool $trim
@@ -242,22 +243,22 @@ function getGuidV4($trim = true)
     // OSX/Linux
     if (function_exists('openssl_random_pseudo_bytes') === true) {
         $data = openssl_random_pseudo_bytes(16);
-        $data[6] = chr(ord($data[6]) & 0x0f | 0x40);    // set version to 0100
-        $data[8] = chr(ord($data[8]) & 0x3f | 0x80);    // set bits 6-7 to 10
+        $data[6] = chr(ord($data[6]) & 0x0f | 0x40); // set version to 0100
+        $data[8] = chr(ord($data[8]) & 0x3f | 0x80); // set bits 6-7 to 10
         return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
     }
     // Fallback (PHP 4.2+)
-    mt_srand((double)microtime() * 10000);
+    mt_srand((double) microtime() * 10000);
     $charid = strtolower(md5(uniqid(rand(), true)));
-    $hyphen = chr(45);                  // "-"
-    $lbrace = $trim ? "" : chr(123);    // "{"
-    $rbrace = $trim ? "" : chr(125);    // "}"
+    $hyphen = chr(45); // "-"
+    $lbrace = $trim ? "" : chr(123); // "{"
+    $rbrace = $trim ? "" : chr(125); // "}"
     $guidv4 = $lbrace .
-        substr($charid, 0, 8) . $hyphen .
-        substr($charid, 8, 4) . $hyphen .
-        substr($charid, 12, 4) . $hyphen .
-        substr($charid, 16, 4) . $hyphen .
-        substr($charid, 20, 12) .
+    substr($charid, 0, 8) . $hyphen .
+    substr($charid, 8, 4) . $hyphen .
+    substr($charid, 12, 4) . $hyphen .
+    substr($charid, 16, 4) . $hyphen .
+    substr($charid, 20, 12) .
         $rbrace;
     return $guidv4;
 }
@@ -266,7 +267,6 @@ function format_time($value)
 {
     return date('Y-m-d', $value);
 }
-
 
 /**
  * curl请求指定url (get)
@@ -284,7 +284,7 @@ function curl($url, $data = [])
     curl_setopt($curl, CURLOPT_URL, $url);
     curl_setopt($curl, CURLOPT_HEADER, false);
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);//这个是重点。
+    curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false); //这个是重点。
     $result = curl_exec($curl);
     curl_close($curl);
     return $result;
@@ -299,17 +299,39 @@ function jsonRecursive(&$array)
         if (is_array($value)) {
             jsonRecursive($array[$key]);
         } else {
-            if($value == 'true'){
+            if ($value == 'true') {
                 $array[$key] = true;
-            } else if($value == 'false'){
+            } else if ($value == 'false') {
                 $array[$key] = false;
-            } else if(is_numeric($value)){
-                if(is_int($value + 0)){
+            } else if (is_numeric($value)) {
+                if (is_int($value + 0)) {
                     $array[$key] = intval($value);
-                }else if(is_float($value + 0)){
+                } else if (is_float($value + 0)) {
                     $array[$key] = floatval($value);
                 }
             }
+        }
+    }
+}
+
+/**
+ * 时间戳翻译
+ */
+function time_tran($time)
+{
+    $t = time() - strtotime($time);
+    $f = array(
+        '31536000' => '年',
+        '2592000' => '个月',
+        '604800' => '星期',
+        '86400' => '天',
+        '3600' => '小时',
+        '60' => '分钟',
+        '1' => '秒',
+    );
+    foreach ($f as $k => $v) {
+        if (0 != $c = floor($t / (int) $k)) {
+            return $c . $v . '前';
         }
     }
 }

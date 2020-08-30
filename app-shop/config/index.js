@@ -12,7 +12,7 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
       '/index.php':{
-         target: 'http://127.0.0.1/shop.php',
+         target: 'http://127.0.0.1/shop.php/',
          changeOrigin: true, // 如果接口跨域，需要进行这个参数配置
       }
     },

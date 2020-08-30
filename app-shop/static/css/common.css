@@ -366,9 +366,11 @@ a.link:hover{ color: #3a8ee6e;}
 .mt16{ margin-top: 16px;}
 .mt30{ margin-top: 30px;}
 .mt50{ margin-top: 50px;}
+.mb10{ margin-bottom: 10px;}
 .mb16{ margin-bottom: 16px;}
 .ml4{ margin-left: 4px;}
 .ml10{ margin-left: 10px;}
+.mr10{ margin-right: 10px;}
 
 /*padding*/
 .p2{ padding: 2px;}
@@ -385,6 +387,7 @@ a.link:hover{ color: #3a8ee6e;}
 .pl16 {padding-left: 16px;}
 .pr16{padding-right: 16px;}
 .pb16{padding-bottom: 16px;}
+.pb50{padding-bottom: 50px;}
 
 /*line height*/
 .lh24{ line-height: 24px;}

@@ -53,5 +53,4 @@ class Access extends AccessModel
         return $ar;
     }
 
-
 }

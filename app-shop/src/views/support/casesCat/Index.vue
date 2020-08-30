@@ -8,8 +8,8 @@
     <!--内容-->
     <div class="content">
       <div class="table-wrap">
-        <el-table size="mini" :data="tableData" row-key="category_id" border default-expand-all :tree-props="{ children: 'child' }" style="width: 100%">
-          <el-table-column prop="category_id" label="ID" width="100"></el-table-column>
+        <el-table size="mini" :data="tableData" row-key="cid" border default-expand-all :tree-props="{ children: 'child' }" style="width: 100%" v-loading="loading">
+          <el-table-column prop="cid" label="ID" width="100"></el-table-column>
           <el-table-column prop="name" label="分类名称" width="300"></el-table-column>
           <el-table-column prop="sort" label="分类排序"></el-table-column>
           <el-table-column prop="create_time" label="添加时间"></el-table-column>
@@ -111,7 +111,7 @@
           })
           .then(() => {
             casesApi.catDel({
-              category_id: row.category_id
+              cid: row.cid
             }).then(data => {
               self.$message({
                 message: '删除成功',

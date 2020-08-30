@@ -14,6 +14,12 @@ namespace think;
 
 require __DIR__ . '/../vendor/autoload.php';
 
+if($_SERVER['HTTP_ORIGIN']){
+    header('Access-Control-Allow-Origin: ' . $_SERVER['HTTP_ORIGIN']);
+    header('Access-Control-Allow-Credentials: true');
+    header('Access-Control-Allow-Headers: *');
+}
+
 // 执行HTTP应用并响应
 $http = (new App())->http;
 

@@ -41,7 +41,7 @@ class CasesCat extends CategoryModel
     /**
      * 删除商品分类
      */
-    public function remove($categoryId)
+    public function remove()
     {
         $this->deleteCache();
         return $this->delete();
@@ -52,7 +52,6 @@ class CasesCat extends CategoryModel
      */
     private function deleteCache()
     {
-        return Cache::delete('category_' . static::$app_id);
+        return Cache::delete('casescat_' . static::$app_id);
     }
-
 }

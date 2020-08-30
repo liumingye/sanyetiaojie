@@ -5,8 +5,10 @@ namespace app\shop\service;
 use app\common\model\shop\Access;
 use think\facade\Session;
 use app\shop\model\auth\User;
-use app\shop\model\auth\UserRole;
-use app\shop\model\auth\RoleAccess;
+use app\shop\model\auth\AccessRole;
+
+use app\shop\model\shop\Access as AccessModel;
+use app\shop\model\shop\AccessRole as AccessRoleModel;
 
 /**
  * 商家后台权限业务
@@ -24,6 +26,8 @@ class AuthService
 
     // 权限验证白名单
     protected $allowAllAction = [
+        'auth/user/getRoleList',
+        'index/test',
         // 测试入口
         'index/test',
         // 用户登录
@@ -85,10 +89,10 @@ class AuthService
      */
     public function checkPrivilege($url, $strict = true)
     {
-        if (!is_array($url)):
+        if (!is_array($url)) :
             return $this->checkAccess($url);
-        else:
-            foreach ($url as $val):
+        else :
+            foreach ($url as $val) :
                 if ($strict && !$this->checkAccess($val)) {
                     return false;
                 }
@@ -111,20 +115,25 @@ class AuthService
             return true;
         }
 
+        $find = array('._');
+        $replace = array('/');
+        $url = str_replace($find, $replace, $url);
+
         // 验证当前请求是否在白名单
         if (in_array($url, $this->allowAllAction)) {
             return true;
         }
 
-
         // 通配符支持
         foreach ($this->allowAllAction as $action) {
-            if (strpos($action, '*') !== false
+            if (
+                strpos($action, '*') !== false
                 && preg_match('/^' . str_replace('/', '\/', $action) . '/', $url)
             ) {
                 return true;
             }
         }
+
         // 获取当前用户的权限url列表
         if (!in_array($url, $this->getAccessUrls())) {
             return false;
@@ -139,14 +148,22 @@ class AuthService
     {
         if (empty($this->accessUrls)) {
             // 获取当前用户的角色集
-            $roleIds = UserRole::getRoleIds($this->user['shop_user_id']);
-
-            // 根据已分配的权限
-            $accessIds = RoleAccess::getAccessIds($roleIds);
-            // 获取当前角色所有权限链接
-            $this->accessUrls = Access::getAccessUrls($accessIds);
+            $all = (new AccessRoleModel)->withoutGlobalScope()
+                ->field('aid')
+                ->where('rid', $this->user['role'])
+                ->select()
+                ->toArray();
+            $all = array_column($all, 'aid');
+            $res = (new AccessModel)
+                ->withoutGlobalScope()
+                ->field('url')
+                ->where('access_id', 'IN', $all)
+                ->order('sort')
+                ->select()
+                ->toArray();
+            $res = array_filter(array_column($res, 'url'));
+            $this->accessUrls = $res;
         }
         return $this->accessUrls;
     }
-
 }

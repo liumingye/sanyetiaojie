@@ -7,7 +7,7 @@
   <div class="product-add">
     <!--form表单-->
     <el-form size="small" ref="form" :model="form" :rules="rules" label-width="150px">
-      <div class="common-form">哈哈哈哈哈哈</div>
+      <div class="common-form">关于我们</div>
       <!--交易设置-->
       <!-- <div class="common-form">调解类型说明文档</div>
       <el-form-item label="未支付订单"  prop="close_days">

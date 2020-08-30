@@ -2,7 +2,7 @@
 
 namespace app\shop\controller\file;
 
-use app\JjjController;
+use app\SyController;
 use app\shop\model\file\UploadFile;
 use app\common\library\storage\Driver as StorageDriver;
 use app\shop\model\settings\Setting as SettingModel;
@@ -10,7 +10,7 @@ use app\shop\model\settings\Setting as SettingModel;
 /**
  * 文件库管理
  */
-class Upload extends JjjController
+class Upload extends SyController
 {
     /**
      * 图片上传接口

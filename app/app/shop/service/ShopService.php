@@ -7,12 +7,16 @@ use app\shop\model\product\Product;
 use app\shop\model\order\Order;
 use app\shop\model\user\User;
 use app\shop\model\product\Comment;
+use app\shop\model\order\Mediate;
+use app\shop\model\user\Feedback;
 
 /**
  * 商城模型
  */
 class ShopService
 {
+    private $MediateModel;
+    private $FeedbackModel;
     //商品模型
     private $ProductModel;
    //订单模型
@@ -28,6 +32,9 @@ class ShopService
     public function __construct()
     {
         /* 初始化模型 */
+        $this->MediateModel = new Mediate();
+        $this->FeedbackModel = new Feedback();
+
         $this->ProductModel = new Product();
         $this->OrderModel = new Order();
         $this->UserModel = new User();
@@ -43,14 +50,10 @@ class ShopService
         $yesterday = date('Y-m-d', strtotime('-1 day'));
         $data = [
             'widget_card' => [
-                // 商品总量
-                'product_total' => $this->getProductTotal(),
-                // 用户总量
-                'user_total' => $this->getUserTotal(),
-                // 订单总量
-                'order_total' => $this->getOrderTotal(),
-                // 评价总量
-                'comment_total' => $this->getCommentTotal()
+                'mediate_total' => $this->getMediateTotal(),
+                'help_total' => $this->getCommentTotal(),
+                'feedback_total' => $this->getFeedbackTotal(),
+                'user_total' => $this->getUserTotal()
             ],
             'widget_outline' => [
                 // 销售额(元)
@@ -90,13 +93,16 @@ class ShopService
         return $data;
     }
 
-    /**
-     * 获取商品总量
-     */
-    private function getProductTotal()
+    private function getMediateTotal()
     {
-        return number_format($this->ProductModel->getProductTotal());
+        return number_format($this->MediateModel->getMediateTotal());
     }
+    
+    private function getFeedbackTotal()
+    {
+        return number_format($this->FeedbackModel->getFeedbackTotal());
+    }
+
 
     /**
      * 获取商品库存告急总量

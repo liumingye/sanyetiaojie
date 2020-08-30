@@ -39,6 +39,7 @@ class User extends BaseModel
             'user' => [
                 'shop_user_id' => $user['shop_user_id'],
                 'user_name' => $user['user_name'],
+                'role' => $user['role'],
             ],
             'app' => $app->toArray(),
             'is_login' => true,

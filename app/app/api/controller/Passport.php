@@ -21,4 +21,10 @@ class Passport extends Controller
         ]);
     }
 
+    public function getPhone()
+    {
+        $model = new UserModel;
+        return $this->renderSuccess('',$model->getPhone($this->request->post()));
+    }
+
 }

@@ -18,7 +18,7 @@ class Cases extends BaseModel
         $params = array_merge([
             'category_id' => '0',
             'text' => '',
-            'list_rows' => 28,
+            'list_rows' => 10,
             'field' => '*'
         ], $param);
 
@@ -30,8 +30,7 @@ class Cases extends BaseModel
         if ($params['text'] != '') {
             $params['text'] = "%{$params['text']}%";
             $model = $model
-                ->where('title', 'like', $params['text'])
-                ->where('text', 'like', $params['text']);
+                ->where('title', 'like', $params['text']);
         }
 
         $list = $model
@@ -56,4 +55,10 @@ class Cases extends BaseModel
         // 整理商品数据并返回
         return $model;
     }
+
+    public static function detail($id)
+    {
+        return self::find($id);
+    }
+    
 }

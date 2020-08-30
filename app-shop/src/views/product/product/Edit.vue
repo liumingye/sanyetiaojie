@@ -150,8 +150,6 @@
 </script>
 
 <style lang="scss" scoped>
-  .basic-setting-content {}
-
   .product-add {
     padding-bottom: 50px;
   }

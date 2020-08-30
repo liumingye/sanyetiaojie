@@ -38,6 +38,7 @@ class ComposerStaticInit848057fcc1af091793b13a78a4279f8f
         'Z' => 
         array (
             'Zxing\\' => 6,
+            'Zend\\Escaper\\' => 13,
         ),
         'S' => 
         array (
@@ -70,6 +71,8 @@ class ComposerStaticInit848057fcc1af091793b13a78a4279f8f
             'Psr\\Http\\Message\\' => 17,
             'Psr\\Container\\' => 14,
             'Psr\\Cache\\' => 10,
+            'PhpOffice\\PhpWord\\' => 18,
+            'PhpOffice\\Common\\' => 17,
         ),
         'O' => 
         array (
@@ -135,6 +138,10 @@ class ComposerStaticInit848057fcc1af091793b13a78a4279f8f
         'Zxing\\' => 
         array (
             0 => __DIR__ . '/..' . '/khanamiryan/qrcode-detector-decoder/lib',
+        ),
+        'Zend\\Escaper\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/zendframework/zend-escaper/src',
         ),
         'Symfony\\Polyfill\\Php72\\' => 
         array (
@@ -227,6 +234,14 @@ class ComposerStaticInit848057fcc1af091793b13a78a4279f8f
         'Psr\\Cache\\' => 
         array (
             0 => __DIR__ . '/..' . '/psr/cache/src',
+        ),
+        'PhpOffice\\PhpWord\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/phpoffice/phpword/src/PhpWord',
+        ),
+        'PhpOffice\\Common\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/phpoffice/common/src/Common',
         ),
         'Overtrue\\Socialite\\' => 
         array (
@@ -327,6 +342,10 @@ class ComposerStaticInit848057fcc1af091793b13a78a4279f8f
         0 => __DIR__ . '/../..' . '/extend',
     );
 
+    public static $classMap = array (
+        'PclZip' => __DIR__ . '/..' . '/pclzip/pclzip/pclzip.lib.php',
+    );
+
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
@@ -334,6 +353,7 @@ class ComposerStaticInit848057fcc1af091793b13a78a4279f8f
             $loader->prefixDirsPsr4 = ComposerStaticInit848057fcc1af091793b13a78a4279f8f::$prefixDirsPsr4;
             $loader->prefixesPsr0 = ComposerStaticInit848057fcc1af091793b13a78a4279f8f::$prefixesPsr0;
             $loader->fallbackDirsPsr0 = ComposerStaticInit848057fcc1af091793b13a78a4279f8f::$fallbackDirsPsr0;
+            $loader->classMap = ComposerStaticInit848057fcc1af091793b13a78a4279f8f::$classMap;
 
         }, null, ClassLoader::class);
     }

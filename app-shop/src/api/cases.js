@@ -27,19 +27,19 @@ let CasesApi = {
         return request._post('support.cases/getBaseData', data, errorback);
     },
     /*新增法律*/
-    addLaw(data, errorback) {
+    addCases(data, errorback) {
         return request._post('support.cases/add', data, errorback);
     },
     /*编辑法律*/
-    editLaw(data, errorback) {
+    editCases(data, errorback) {
         return request._post('support.cases/edit', data, errorback);
     },
     /*删除法律*/
-    delLaw(data, errorback) {
+    delCases(data, errorback) {
         return request._post('support.cases/delete', data, errorback);
     },
     /*法律详情*/
-    getLaw(data, errorback) {
+    getCases(data, errorback) {
         return request._post('support.cases/info', data, errorback);
     }
 }

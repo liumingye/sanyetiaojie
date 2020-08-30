@@ -12,13 +12,53 @@ class Lawyer extends BaseModel
     //主键字段名
     protected $pk = 'id';
 
+    public function getCollect($param)
+    {
+        $model = $this;
+        // 默认搜索条件
+        $params = array_merge([
+            'category_id' => '0',
+            'list_rows' => 10,
+            'field' => '*',
+            'user_id' => '0',
+        ], $param);
+        // 筛选条件
+        $filter = [];
+        if ($params['category_id'] > 0) {
+            $model = $model->where('category_id', $params['category_id']);
+        }
+        $withCollect = [
+            'hasCollect' => function ($query) use ($params) {
+                $query->where('uid', $params['user_id']);
+            },
+        ];
+        $withImage = [
+            'image' => function ($query) {
+                $query->field(['file_id,file_url,file_name,storage,save_name'])->hidden(['file_id', 'file_url', 'file_name', 'storage', 'save_name']);
+            },
+        ];
+        $list = $model
+            ->field($params['field'])
+            ->withJoin($withCollect)
+            ->with($withImage)
+            ->where($filter)
+            ->order('id desc')
+            ->paginate($params, false, [
+                'query' => \request()->request(),
+            ]);
+
+        // 整理列表数据并返回
+        return $this->setListData($list);
+    }
+
     public function getList($param)
     {
         $model = $this;
         // 默认搜索条件
         $params = array_merge([
             'category_id' => '0',
-            'list_rows' => 30,
+            'text' => '',
+            'list_rows' => 10,
             'field' => '*',
             'user_id' => '0'
         ], $param);
@@ -28,20 +68,25 @@ class Lawyer extends BaseModel
         if ($params['category_id'] > 0) {
             $model = $model->where('category_id', $params['category_id']);
         }
+        if ($params['text'] != '') {
+            $params['text'] = "%{$params['text']}%";
+            $model = $model
+                ->where('name', 'like', $params['text']);
+        }
         $with = [];
         if ($params['user_id'] > 0) {
             $withCollect = [
                 'hasCollect' => function ($query) use ($params) {
                     $query->where('uid', $params['user_id']);
-                }
+                },
             ];
             $with = array_merge($with, $withCollect);
         }
 
         $withImage = [
             'image' => function ($query) {
-                $query->field(['file_id,storage,save_name'])->hidden(['file_id', 'storage', 'save_name']);
-            }
+                $query->field(['file_id,file_url,file_name,storage,save_name'])->hidden(['file_id', 'file_url', 'file_name', 'storage', 'save_name']);
+            },
         ];
         $with = array_merge($with, $withImage);
 
@@ -74,13 +119,14 @@ class Lawyer extends BaseModel
         return $data;
     }
 
-    public function getInfo($id)
+    public function getInfo($id, $with = [])
     {
+        $with = array_merge(['image' => function ($query) {
+            $query->field(['file_id,file_url,file_name,storage,save_name'])->hidden(['storage', 'file_url', 'file_name', 'save_name']);
+        }], $with);
         $model = $this
             ->where('id', '=', $id)
-            ->with(['image' => function ($query) {
-                $query->field(['file_id,storage,save_name'])->hidden(['file_id', 'storage', 'save_name']);
-            }])
+            ->with($with)
             ->find();
         if (empty($model)) {
             return $model;
@@ -103,7 +149,7 @@ class Lawyer extends BaseModel
         if ($t) {
             $res = (new LawyerCollectModel)->where([
                 'uid' => $user_id,
-                'lid' => $id
+                'lid' => $id,
             ])->find();
             if ($res) {
                 return true;
@@ -111,11 +157,21 @@ class Lawyer extends BaseModel
                 return (new LawyerCollectModel)->save([
                     'uid' => $user_id,
                     'lid' => $id,
-                    'app_id' => self::$app_id
+                    'app_id' => self::$app_id,
                 ]);
             }
         } else {
             return (new LawyerCollectModel)->where(['uid' => $user_id, 'lid' => $id])->delete();
         }
+    }
+
+    public function shopUser()
+    {
+        return $this->hasOne('app\\common\\model\\shop\\User', 'shop_user_id', 'admin_id');
+    }
+
+    public static function detail($id)
+    {
+        return self::find($id);
     }
 }

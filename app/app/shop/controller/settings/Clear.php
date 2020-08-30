@@ -38,13 +38,13 @@ class Clear extends Controller
         return [
             'category' => [
                 'type' => 'cache',
-                'key' => 'category_' . $app_id,
-                'name' => '商品分类'
+                'key' => 'lawyer_' . $app_id,
+                'name' => '律师分类'
             ],
             'setting' => [
                 'type' => 'cache',
                 'key' => 'setting_' . $app_id,
-                'name' => '商城设置'
+                'name' => '小程序设置'
             ],
             'app' => [
                 'type' => 'cache',
@@ -53,7 +53,7 @@ class Clear extends Controller
             ],
             'temp' => [
                 'type' => 'file',
-                'name' => '临时图片',
+                'name' => '临时文件',
                 'dirPath' => [
                     'temp' => root_path('public') . '/temp/' . $app_id . '/',
                     'runtime' => root_path('runtime') . '/image/' . $app_id . '/'

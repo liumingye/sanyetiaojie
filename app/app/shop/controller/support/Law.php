@@ -15,12 +15,13 @@ class Law extends Controller
         $text = input('text', '', 'htmlspecialchars');
 
         $category = CategoryModel::getCacheTreeSimple();
-        $category = array_combine(array_column($category, 'category_id'), $category);
+        $category = array_combine(array_column($category, 'cid'), $category);
 
         $list = (new LawModel)->getList([
             'category_id' => $cid,
             'text' => $text,
             'page' => $page,
+            'list_rows' => 10,
             'field' => 'id,category_id,title,create_time',
             'status' => 1
         ]);

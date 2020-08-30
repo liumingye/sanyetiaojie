@@ -10,8 +10,7 @@ import {delCookie,deleteSessionStorage} from '@/utils/base.js';
 
 //axios.defaults.timeout = 5000;                        //响应时间
 axios.defaults.headers['Content-Type'] = 'application/x-www-form-urlencoded;charset=UTF-8'; //配置请求头
-//axios.defaults.baseURL = 'http://www.jjj-shop.com/';   //配置接口地址
-axios.defaults.baseURL = 'http://127.0.0.1/shop.php'; //配置接口地址
+axios.defaults.baseURL = 'http://127.0.0.1/shop.php/'; //配置接口地址
 axios.defaults.withCredentials = true;
 axios.defaults.responseType = 'json';
 
@@ -62,6 +61,11 @@ axios.interceptors.response.use((res) =>
     });
     return Promise.reject(error);
 });
+
+export function getbaseURL()
+{
+    return axios.defaults.baseURL;
+}
 
 /**
  * 返回一个Promise(发送post请求)
@@ -134,4 +138,5 @@ export default {
     _post,
     _get,
     _upload,
+    getbaseURL,
 }

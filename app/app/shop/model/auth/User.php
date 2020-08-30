@@ -4,7 +4,6 @@ namespace app\shop\model\auth;
 
 use app\common\model\shop\User as UserModel;
 
-
 /**
  * 角色模型
  */
@@ -13,13 +12,11 @@ class User extends UserModel
 
     public function getList($limit = 20)
     {
-        return $this->with(['userRole.role'])->where('is_delete', '=', 0)->
-        order(['create_time' => 'desc'])
+        return $this->where('is_delete', '=', 0)->order(['create_time' => 'desc'])
             ->paginate($limit, false, [
-                'query' => \request()->request()
+                'query' => \request()->request(),
             ]);
     }
-
 
     /**
      * 获取所有角色列表
@@ -29,7 +26,6 @@ class User extends UserModel
         $all = $this->getAll();
         return $this->formatTreeData($all);
     }
-
 
     public function getMenu()
     {
@@ -41,10 +37,10 @@ class User extends UserModel
         return array_merge($role_id, array_column($arr->toArray(), 'role_id'));
     }
 
-
     public function getInfo($where)
     {
-        return $this->with(['access'])->where($where)->find();
+        // return $this->with(['access'])->where($where)->find();
+        return $this->where($where)->find();
     }
 
     /**
@@ -100,48 +96,54 @@ class User extends UserModel
         $prefix = '';
         if ($deep > 1) {
             for ($i = 1; $i <= $deep - 1; $i++) {
-//                $prefix .= '&nbsp;&nbsp;&nbsp;├ ';
+                //                $prefix .= '&nbsp;&nbsp;&nbsp;├ ';
                 $prefix .= '   ├ ';
             }
-//            $prefix .= '&nbsp;';
+            //            $prefix .= '&nbsp;';
             $prefix .= ' ';
         }
         return $prefix;
     }
 
-    public function add($data)
+    public function addUser($data, $force = false)
     {
         $this->startTrans();
         try {
+            $res = $this->where(['user_name' => trim($data['user_name'])])->find();
+            // 是否已有此用户
+            if ($res) {
+                if (!$force) {
+                    return false;
+                } else {
+                    // 强制添加 随机后缀
+                    $data['user_name'] .= mt_rand(1000, 9999);
+                }
+            }
+            // 是否为超级管理员
+            $data['role'] = intval($data['role']);
+            if ($data['role'] == 0) {
+                $data['is_super'] = 1;
+            } else {
+                $data['is_super'] = 0;
+            }
+            // 生成数据
             $arr = [
                 'user_name' => trim($data['user_name']),
                 'password' => salt_hash($data['password']),
                 'real_name' => trim($data['real_name']),
-                'role_id' => $data['role_id'],
-                'app_id' => self::$app_id
+                'role' => $data['role'],
+                'is_super' => $data['is_super'],
+                'app_id' => self::$app_id,
             ];
-
             $res = self::create($arr);
-            $model = new RoleAccess();
-            $add_arr = [];
-            $model = new UserRole();
-            foreach ($data['role_id'] as $val) {
-                $add_arr[] = [
-                    'shop_user_id' => $res['shop_user_id'],
-                    'role_id' => $val,
-                    'app_id' => self::$app_id,
-                ];
-            }
-            $model->saveAll($add_arr);
             // 事务提交
             $this->commit();
-            return true;
+            return $res;
         } catch (\Exception $e) {
             $this->error = $e->getMessage();
             $this->rollback();
             return false;
         }
-
     }
 
     public function getUserName($where, $shop_user_id = 0)
@@ -152,34 +154,36 @@ class User extends UserModel
         return $this->where($where)->count();
     }
 
-
-    public function edit($data)
+    public function editUser($data)
     {
         $this->startTrans();
         try {
+            $res = $this->where(['user_name' => trim($data['user_name'])])->where('shop_user_id', '<>', $data['shop_user_id'])->find();
+            // 是否已有此用户
+            if ($res) {
+                return false;
+            }
+            // 是否为超级管理员
+            $data['role'] = intval($data['role']);
+            if ($data['role'] == 0) {
+                $data['is_super'] = 1;
+            } else {
+                $data['is_super'] = 0;
+            }
+            // 生成数据
             $arr = [
-                'user_name' => $data['params']['user_name'],
-                'password' => salt_hash($data['params']['password']),
-                'real_name' => $data['params']['real_name'],
+                'user_name' => $data['user_name'],
+                'password' => salt_hash($data['password']),
+                'real_name' => $data['real_name'],
+                'role' => $data['role'],
+                'is_super' => $data['is_super'],
+                'app_id' => self::$app_id,
             ];
-            if (empty($data['params']['password'])) {
+            if (empty($data['password'])) {
                 unset($arr['password']);
             }
-
-            $where['shop_user_id'] = $data['params']['shop_user_id'];
+            $where['shop_user_id'] = $data['shop_user_id'];
             self::update($arr, $where);
-
-            $model = new UserRole();
-            UserRole::destroy($where);
-            $add_arr = [];
-            foreach ($data['access_id'] as $val) {
-                $add_arr[] = [
-                    'shop_user_id' => $data['params']['shop_user_id'],
-                    'role_id' => $val,
-                    'app_id' => self::$app_id
-                ];
-            }
-            $model->saveAll($add_arr);
             // 事务提交
             $this->commit();
             return true;
@@ -188,7 +192,6 @@ class User extends UserModel
             $this->rollback();
             return false;
         }
-
     }
 
     public function getChild($where)
@@ -201,5 +204,4 @@ class User extends UserModel
         self::update(['is_delete' => 1], $where);
         return UserRole::destroy($where);
     }
-
 }

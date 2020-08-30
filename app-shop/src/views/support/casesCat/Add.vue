@@ -18,7 +18,7 @@
 </template>
 
 <script>
-  import LawApi from '@/api/law.js';
+  import CasesApi from '@/api/cases.js';
   import Upload from '@/components/file/Upload';
   export default {
     components: {
@@ -66,7 +66,7 @@
         self.$refs.form.validate((valid) => {
           if (valid) {
             self.loading = true;
-            LawApi.catAdd(params).then(data => {
+            CasesApi.catAdd(params).then(data => {
               self.loading = false;
               self.$message({
                 message: '添加成功',

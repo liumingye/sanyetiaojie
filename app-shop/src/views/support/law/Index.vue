@@ -3,9 +3,9 @@
     <!--搜索表单-->
     <div class="common-seach-wrap">
       <el-form size="small" :inline="true" :model="formInline" class="demo-form-inline">
-        <el-form-item label="标题"><el-input v-model="formInline.nick_name" placeholder="请输入标题"></el-input></el-form-item>
+        <el-form-item label="标题"><el-input v-model="formInline.text" placeholder="请输入标题" clearable></el-input></el-form-item>
         <el-form-item><el-button type="primary" @click="onSubmit">查询</el-button></el-form-item>
-        <el-form-item><el-button size="small" type="primary" icon="el-icon-plus" @click="addClick" v-auth="'/support/lawcat/add'">添加法规</el-button></el-form-item>
+        <el-form-item><el-button size="small" type="primary" icon="el-icon-plus" @click="addClick" v-auth="'/support/law/add'">添加法规</el-button></el-form-item>
       </el-form>
     </div>
     <!--内容-->
@@ -53,18 +53,15 @@ export default {
       /*列表数据*/
       tableData: [],
       /*一页多少条*/
-      pageSize: 20,
+      pageSize: 10,
       /*一共多少条数据*/
       totalDataNumber: 0,
       /*当前是第几页*/
       curPage: 1,
       /*横向表单数据模型*/
       formInline: {
-        nick_name: '',
-        value1: ''
-      },
-      /*时间*/
-      value1: ''
+        text: ''
+      }
     };
   },
   created() {

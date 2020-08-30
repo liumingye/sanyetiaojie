@@ -53,7 +53,7 @@ class Upload extends Controller
         // 添加文件库记录
         $uploadFile = $this->addUploadFile($fileName, $fileInfo, 'image', $saveName, $parmas);
         $data = [
-            'file_id' => $uploadFile['id'],
+            'file_id' => $uploadFile['file_id'],
             'file_path' => $uploadFile['file_path'],
         ];
         // 图片上传成功

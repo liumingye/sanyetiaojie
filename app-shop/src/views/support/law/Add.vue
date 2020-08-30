@@ -1,5 +1,5 @@
 <template>
-  <div class="law-add">
+  <div class="pb50">
     <!--form表单-->
     <el-form size="small" ref="form" :model="form" label-width="100px">
       <div class="basic-setting-content pl16 pr16">
@@ -11,7 +11,7 @@
         <el-form-item label="分类：" :rules="[{required: true,message: ' '}]" prop="model.category_id">
           <el-select v-model="form.model.category_id">
             <template v-for="cat in form.category">
-              <el-option :value="cat.category_id" :key="cat.category_id" :label="cat.name"></el-option>
+              <el-option :value="cat.cid" :key="cat.cid" :label="cat.name"></el-option>
             </template>
           </el-select>
         </el-form-item>

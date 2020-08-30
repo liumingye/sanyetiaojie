@@ -1,23 +1,37 @@
 <template>
-  <!--
-    	作者：luoyiming
-    	时间：2019-10-24
-    	描述：后台系统首页
-    -->
   <div class="home">
-    <!-- <div class="common-form mt16">
-      商城统计
-    </div> -->
     <div class="operation-wrap">
       <el-row>
         <el-col :span="6">
           <div class="grid-content">
             <div class="pic">
-              <Icon :iconname="'#icon-tubiaozhizuomoban-'"></Icon>
+              <Icon :iconname="'#icon-shangping'"></Icon>
             </div>
             <div class="info">
-              <h3>{{tableData.product_total}}</h3>
-              <p>商品总量</p>
+              <h3>{{tableData.mediate_total}}</h3>
+              <p>案件总量</p>
+            </div>
+          </div>
+        </el-col>
+        <el-col :span="6">
+          <div class="grid-content">
+            <div class="pic">
+              <Icon :iconname="'#icon-dingdan'"></Icon>
+            </div>
+            <div class="info">
+              <h3>{{tableData.help_total}}</h3>
+              <p>在线援助</p>
+            </div>
+          </div>
+        </el-col>
+        <el-col :span="6">
+          <div class="grid-content">
+            <div class="pic">
+              <Icon :iconname="'#icon-pingjia-tianchong'"></Icon>
+            </div>
+            <div class="info">
+              <h3>{{tableData.feedback_total}}</h3>
+              <p>意见反馈</p>
             </div>
           </div>
         </el-col>
@@ -29,28 +43,6 @@
             <div class="info">
               <h3>{{tableData.user_total}}</h3>
               <p>用户总量</p>
-            </div>
-          </div>
-        </el-col>
-        <el-col :span="6">
-          <div class="grid-content">
-            <div class="pic">
-              <Icon :iconname="'#icon-dingdan'"></Icon>
-            </div>
-            <div class="info">
-              <h3>{{tableData.order_total}}</h3>
-              <p>订单总量</p>
-            </div>
-          </div>
-        </el-col>
-        <el-col :span="6">
-          <div class="grid-content">
-            <div class="pic">
-              <Icon :iconname="'#icon-pingjia-tianchong'"></Icon>
-            </div>
-            <div class="info">
-              <h3>{{tableData.comment_total}}</h3>
-              <p>评价总量</p>
             </div>
           </div>
         </el-col>

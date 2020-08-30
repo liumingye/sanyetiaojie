@@ -6,13 +6,13 @@ use app\api\model\user\User as UserModel;
 use app\api\model\App as AppModel;
 use app\common\exception\BaseException;
 use app\common\library\easywechat\AppMp;
-use app\JjjController;
+use app\SyController;
 use think\facade\Env;
 
 /**
  * API控制器基类
  */
-class Controller extends JjjController
+class Controller extends SyController
 {
 
     // app_id

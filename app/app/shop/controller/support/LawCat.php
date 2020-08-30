@@ -9,7 +9,7 @@ class LawCat extends Controller
 {
 
     /**
-     * 商品分类列表
+     * 分类列表
      */
     public function index()
     {
@@ -19,19 +19,19 @@ class LawCat extends Controller
     }
 
     /**
-     * 删除商品分类
+     * 删除分类
      */
-    public function delete($category_id)
+    public function delete($cid)
     {
-        $model = CategoryModel::find($category_id);
-        if (!$model->remove($category_id)) {
+        $model = CategoryModel::find($cid);
+        if (!$model->remove($cid)) {
             return $this->renderError('删除失败');
         }
         return $this->renderSuccess('删除成功');
     }
 
     /**
-     * 添加商品分类
+     * 添加分类
      */
     public function add()
     {
@@ -44,28 +44,17 @@ class LawCat extends Controller
     }
 
     /**
-     * 编辑商品分类
+     * 编辑分类
      */
-    public function edit($category_id)
+    public function edit($cid)
     {
         // 模板详情
-        $model = CategoryModel::detail($category_id);
+        $model = CategoryModel::detail($cid);
         // 更新记录
         if ($model->edit($this->request->post())) {
             return $this->renderSuccess('更新成功');
         }
         return $this->renderError($model->getError() ?: '更新失败');
     }
-
-    /**
-     * 得到修改图片
-     */
-    public function image($category_id)
-    {
-        $model = new CategoryModel;
-        $detail = $model->detail($category_id);
-        return $this->renderSuccess('', compact('detail'));
-    }
-
 
 }

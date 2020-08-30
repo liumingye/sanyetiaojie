@@ -1,15 +1,11 @@
 <template>
-  <!--
-      作者：luoyiming
-      时间：2019-10-25
-      描述：订单列表
-  -->
-  <div class="user">
+  <div>
     <!--搜索表单-->
     <div class="common-seach-wrap">
       <el-form size="small" :inline="true" :model="searchForm" class="demo-form-inline">
-        <el-form-item label="订单号"><el-input size="small" v-model="searchForm.order_no" placeholder="请输入订单号"></el-input></el-form-item>
-        <el-form-item label="起始时间">
+        <el-form-item label="案件码"><el-input size="small" v-model="searchForm.no" placeholder="请输入案件码" clearable></el-input></el-form-item>
+        <el-form-item label="姓名"><el-input size="small" v-model="searchForm.name" placeholder="请输入姓名" clearable></el-input></el-form-item>
+        <el-form-item label="申请时间">
           <div class="block">
             <span class="demonstration"></span>
             <el-date-picker
@@ -29,70 +25,61 @@
     <div class="product-content">
       <div class="table-wrap">
         <el-tabs v-model="activeName" @tab-click="handleClick">
-          <el-tab-pane label="全部订单" name="all"></el-tab-pane>
-          <el-tab-pane :label="'未付款(' + order_count.payment + ')'" name="payment"></el-tab-pane>
-          <el-tab-pane :label="'待发货(' + order_count.delivery + ')'" name="delivery"></el-tab-pane>
-          <el-tab-pane :label="'待收货(' + order_count.received + ')'" name="received"></el-tab-pane>
-          <el-tab-pane label="待评价" name="comment"></el-tab-pane>
-          <el-tab-pane label="已完成" name="complete"></el-tab-pane>
+          <el-tab-pane label="全部案件" name="all"></el-tab-pane>
+          <el-tab-pane :label="'待受理(' + order_count.accepting + ')'" name="accepting"></el-tab-pane>
+          <el-tab-pane :label="'调解中(' + order_count.adjusting + ')'" name="adjusting"></el-tab-pane>
+          <el-tab-pane :label="'已调解'" name="adjusted"></el-tab-pane>
         </el-tabs>
         <el-table size="small" :data="tableData.data" border :span-method="arraySpanMethod" style="width: 100%" v-loading="loading">
-          <el-table-column prop="order_no" label="订单信息" width="600">
+          <el-table-column prop="category_name" label="分类">
             <template slot-scope="scope">
               <div class="order-code" v-if="scope.row.is_top_row">
-                <span class="c_main">订单号：{{ scope.row.order_no }}</span>
-                <span class="pl16">下单时间：{{ scope.row.create_time }}</span>
+                <span class="c_main">案件码：{{ scope.row.no }}</span>
+                <span class="pl16">申请时间：{{ scope.row.create_time }}</span>
               </div>
               <template v-else>
-                <div class="product-info" v-for="(item, index) in scope.row.product" :key="index">
-                  <div class="pic"><img v-img-url="item.image.file_path" alt="" /></div>
-                  <div class="info">
-                    <div class="name gray3">{{ item.product_name }}</div>
-                    <div class="gray9" v-if="item.product_attr">{{ item.product_attr }}</div>
-                  </div>
-                  <div class="d-c-c d-c">
-                    <div class="orange">￥ {{ item.product_price }}</div>
-                    <div class="gray3">x{{ item.total_num }}</div>
+                <div class="info">
+                  <div class="name gray3">
+                    <span>{{ scope.row.category_name }}</span>
                   </div>
                 </div>
               </template>
             </template>
           </el-table-column>
-          <el-table-column prop="pay_price" label="实付款(单位:元)">
+          <el-table-column prop="name" label="姓名">
             <template slot-scope="scope" v-if="!scope.row.is_top_row">
-              <div class="orange">{{ scope.row.pay_price }}</div>
-              <p class="gray9">(含运费：{{ scope.row.express_price }})</p>
+              <div>{{ scope.row.name }}</div>
+              <div class="gray9">用户ID：({{ scope.row.uid }})</div>
             </template>
           </el-table-column>
-          <el-table-column prop="" label="买家">
+          <el-table-column prop="mobile" label="联系方式">
             <template slot-scope="scope" v-if="!scope.row.is_top_row">
-              <div>{{ scope.row.user.nickName }}</div>
-              <div class="gray9">用户ID：({{ scope.row.user.user_id }})</div>
+              {{ scope.row.mobile }}
             </template>
           </el-table-column>
-          <el-table-column prop="state_text" label="交易状态">
+          <el-table-column prop="appeal" label="诉求">
+            <template slot-scope="scope" v-if="!scope.row.is_top_row">
+              {{ scope.row.appeal }}
+            </template>
+          </el-table-column>
+          <el-table-column prop="other_name" label="对方姓名">
+            <template slot-scope="scope" v-if="!scope.row.is_top_row">
+              {{ scope.row.other_name }}
+            </template>
+          </el-table-column>
+          <el-table-column prop="other_phone" label="对方联系方式">
+            <template slot-scope="scope" v-if="!scope.row.is_top_row">
+              {{ scope.row.other_phone }}
+            </template>
+          </el-table-column>
+          <el-table-column prop="state_text" label="状态">
             <template slot-scope="scope" v-if="!scope.row.is_top_row">
               {{ scope.row.state_text }}
             </template>
           </el-table-column>
-          <el-table-column prop="is_comment" label="评价" width="120">
-            <template slot-scope="scope" v-if="!scope.row.is_top_row">
-              <span v-if="scope.row.is_comment == 0">未评价</span>
-              <span v-else="">已评价</span>
-            </template>
-          </el-table-column>
           <el-table-column fixed="right" label="操作" width="130">
             <template slot-scope="scope" v-if="!scope.row.is_top_row">
-              <el-button @click="addClick(scope.row)" type="text" size="small" v-auth="'/order/order/detail'">订单详情</el-button>
-              <el-button
-                v-if="scope.row.pay_status.value == 20 && scope.row.delivery_status.value == 10 && scope.row.order_status.value != 20 && scope.row.order_status.value != 21"
-                @click="addClick(scope.row)"
-                type="text"
-                size="small"
-              >
-                去发货
-              </el-button>
-              <el-button v-if="scope.row.order_status.value == 21" @click="addClick(scope.row)" type="text" size="small">去审核</el-button>
+              <el-button @click="addClick(scope.row)" type="text" size="small" v-auth="'/order/order/detail'">详情</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -134,16 +121,14 @@ export default {
       curPage: 1,
       /*横向表单数据模型*/
       searchForm: {
-        order_no: '',
+        no: '',
+        name: '',
         create_time: ''
       },
-      /*时间*/
-      create_time: '',
       /*统计*/
       order_count: {
-        payment: 0,
-        delivery: 0,
-        received: 0
+        accepting: 0,
+        adjusting: 0
       }
     };
   },
@@ -156,7 +141,7 @@ export default {
     arraySpanMethod(row) {
       if (row.rowIndex % 2 == 0) {
         if (row.columnIndex === 0) {
-          return [1, 6];
+          return [1, 8];
         }
       }
     },
@@ -198,7 +183,7 @@ export default {
           for (let i = 0; i < res.data.list.data.length; i++) {
             let item = res.data.list.data[i];
             let topitem = {
-              order_no: item.order_no,
+              no: item.no,
               create_time: item.create_time,
               is_top_row: true
             };
@@ -211,15 +196,16 @@ export default {
           self.order_count = res.data.order_count.order_count;
         })
         .catch(error => {});
+      self.$parent.$refs.rightContentBox && (self.$parent.$refs.rightContentBox.scrollTop = 0);
     },
     /*打开添加*/
     addClick(row) {
       let self = this;
-      let params = row.order_id;
+      let params = row.id;
       this.$router.push({
         path: '/order/order/Detail',
         query: {
-          order_id: params
+          id: params
         }
       });
     },
@@ -227,26 +213,34 @@ export default {
     onSubmit() {
       let self = this;
       let Params = this.searchForm;
-      Params.name = self.name;
+      Params.type = self.type;
       Params.page = self.curPage;
       Params.list_rows = self.pageSize;
       self.loading = true;
       OrderApi.orderlist(Params, true)
-        .then(data => {
+        .then(res => {
           self.loading = false;
-          self.tableData = data.data.list;
-          self.totalDataNumber = data.data.list.total;
+          let list = [];
+          for (let i = 0; i < res.data.list.data.length; i++) {
+            let item = res.data.list.data[i];
+            let topitem = {
+              no: item.no,
+              create_time: item.create_time,
+              is_top_row: true
+            };
+            list.push(topitem);
+            list.push(item);
+          }
+          self.tableData.data = list;
+          self.totalDataNumber = res.data.list.total;
+          self.order_count = res.data.order_count.order_count;
         })
         .catch(error => {});
     }
   }
 };
 </script>
-<style >
-.product-info {
-  padding: 10px 0;
-  border-top: 1px solid #eeeeee;
-}
+<style lang="scss">
 .table-wrap .product-info:first-of-type {
   border-top: none;
 }

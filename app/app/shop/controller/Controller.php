@@ -3,13 +3,13 @@
 namespace app\shop\controller;
 
 use app\common\exception\BaseException;
-use app\JjjController;
+use app\SyController;
 use app\shop\service\AuthService;
 
 /**
  * 商户后台控制器基类
  */
-class Controller extends JjjController
+class Controller extends SyController
 {
     // 商家登录信息
     protected $store;

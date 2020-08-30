@@ -2,11 +2,11 @@
 
 namespace app\shop\controller\file;
 
-use app\JjjController;
+use app\SyController;
 use app\shop\model\file\UploadFile as UploadFileModel;
 use app\shop\model\file\UploadGroup as UploadGroupModel;
 
-class File extends JjjController
+class File extends SyController
 {
     /**
      * 文件库列表

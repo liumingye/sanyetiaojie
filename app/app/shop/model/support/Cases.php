@@ -16,9 +16,13 @@ class Cases extends CasesModel
         'update_time',
     ];
 
+    protected $type = [
+        'date'    =>  'timestamp:Y-m-d',
+    ];
+    
     public function getBaseData()
     {
-        $category = (new CategoryModel)->getCacheTreeSimple();
+        $category = (new CategoryModel)->getCacheTreeSimple(false);
         return compact('category');
 
     }
@@ -32,7 +36,7 @@ class Cases extends CasesModel
     }
 
     /**
-     * 添加法律
+     * 添加案例
      */
     public function add(array $data)
     {
@@ -51,13 +55,13 @@ class Cases extends CasesModel
     }
 
     /**
-     * 编辑法律
+     * 编辑案例
      */
     public function edit($data)
     {
         $data['app_id'] = self::$app_id;
         return $this->transaction(function () use ($data) {
-            // 保存商品
+            // 保存案例
             $this->save($data);
             return true;
         });

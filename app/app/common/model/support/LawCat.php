@@ -27,11 +27,10 @@ class LawCat extends BaseModel
     {
         $model = new static;
         if (!Cache::get('lawcat_' . $model::$app_id)) {
-            $data = $model->order(['sort' => 'asc', 'create_time' => 'desc'])->select();
+            $data = $model->field('category_id as cid,name,sort,create_time')->order(['sort' => 'asc', 'create_time' => 'desc'])->select();
             $all = !empty($data) ? $data->toArray() : [];
             Cache::tag('cache')->set('lawcat_' . $model::$app_id, compact('all'));
         }
         return Cache::get('lawcat_' . $model::$app_id)['all'];
     }
-
 }
