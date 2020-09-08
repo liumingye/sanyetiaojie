@@ -4,7 +4,6 @@
 namespace app\common\model\user;
 
 use app\common\model\BaseModel;
-use app\common\model\user\PointsLog as PointsLogModel;
 
 /**
  * 用户模型
@@ -15,23 +14,6 @@ class User extends BaseModel
     protected $name = 'user';
     //主键字段名
     protected $pk = 'user_id';
-
-    /**
-     * 关联收货地址表
-     */
-    public function address()
-    {
-        $module = self::getCalledModule() ?: 'common';
-        return $this->hasMany("app\\{$module}\\model\\user\\UserAddress", 'address_id', 'address_id');
-    }
-
-    /**
-     * 关联收货地址表 (默认地址)
-     */
-    public function addressDefault()
-    {
-        return $this->belongsTo('UserAddress', 'address_id', 'address_id');
-    }
 
     /**
      * 获取用户信息
@@ -45,7 +27,7 @@ class User extends BaseModel
         } else {
             $filter['user_id'] = (int)$where;
         }
-        return $model->where($filter)->with(['address', 'addressDefault'])->find();
+        return $model->where($filter)->find();
     }
 
     /**
@@ -56,7 +38,7 @@ class User extends BaseModel
         $model = new static;
         $filter = ['is_delete' => 0];
         $filter = array_merge($filter, ['union_id' => $unionid]);
-        return $model->where($filter)->with(['address', 'addressDefault', 'grade'])->find();
+        return $model->where($filter)->find();
     }
 
     /**

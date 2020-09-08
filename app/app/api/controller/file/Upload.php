@@ -61,6 +61,70 @@ class Upload extends Controller
     }
 
     /**
+     * 视频上传接口
+     */
+    public function video()
+    {
+        // 参数
+        $parmas = $this->postData();
+        // 实例化存储驱动
+        $StorageDriver = new StorageDriver($this->config);
+
+        // 设置上传文件的信息
+        $StorageDriver->setUploadFile('iFile');
+        // 上传视频
+        $saveName = $StorageDriver->upload();
+        if ($saveName == '') {
+            return json(['code' => 0, 'msg' => '视频上传失败' . $StorageDriver->getError()]);
+        }
+        $saveName = str_replace('\\', '/', $saveName);
+        // 视频上传路径
+        $fileName = $StorageDriver->getFileName();
+        // 视频信息
+        $fileInfo = request()->file('iFile');
+        // 添加文件库记录
+        $uploadFile = $this->addUploadFile($fileName, $fileInfo, 'video', $saveName, $parmas);
+        $data = [
+            'file_id' => $uploadFile['file_id'],
+            'file_path' => $uploadFile['file_path'],
+        ];
+        // 视频上传成功
+        return json(['code' => 1, 'msg' => '视频上传成功', 'data' => $data]);
+    }
+
+    /**
+     * 附件上传接口
+     */
+    public function file()
+    {
+        // 参数
+        $parmas = $this->postData();
+        // 实例化存储驱动
+        $StorageDriver = new StorageDriver($this->config);
+
+        // 设置上传文件的信息
+        $StorageDriver->setUploadFile('iFile');
+        // 上传附件
+        $saveName = $StorageDriver->upload();
+        if ($saveName == '') {
+            return json(['code' => 0, 'msg' => '附件上传失败' . $StorageDriver->getError()]);
+        }
+        $saveName = str_replace('\\', '/', $saveName);
+        // 附件上传路径
+        $fileName = $StorageDriver->getFileName();
+        // 附件信息
+        $fileInfo = request()->file('iFile');
+        // 添加文件库记录
+        $uploadFile = $this->addUploadFile($fileName, $fileInfo, 'file', $saveName, $parmas);
+        $data = [
+            'file_id' => $uploadFile['file_id'],
+            'file_path' => $uploadFile['file_path'],
+        ];
+        // 附件上传成功
+        return json(['code' => 1, 'msg' => '附件上传成功', 'data' => $data]);
+    }
+
+    /**
      * 添加文件库上传记录
      */
     private function addUploadFile($fileName, $fileInfo, $fileType, $savename, $parmas)
@@ -86,5 +150,4 @@ class Upload extends Controller
         ]);
         return $model;
     }
-
 }

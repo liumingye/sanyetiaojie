@@ -11,7 +11,6 @@ class News extends NewsModel
      */
     protected $hidden = [
         'app_id',
-        'status',
         'update_time',
     ];
 

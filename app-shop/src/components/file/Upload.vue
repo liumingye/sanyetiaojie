@@ -1,41 +1,23 @@
 <template>
-  <!--
-    	作者：4948286@qq.com
-    	时间：2019-10-30
-    	描述：图片上传
-    -->
   <div class="upload-wrap">
-    <el-dialog title="文件管理" :visible.sync="dialogVisible" :close-on-click-modal="false" custom-class="upload-dialog"
-      :close-on-press-escape="false" @close="cancelFunc" :width="dialogWidth" :append-to-body="true">
-      <!-- <el-tabs v-model="activeType" @tab-click="selectTypeFunc">
-        <el-tab-pane label="我的资源库" name="0"></el-tab-pane>
-        <el-tab-pane label="文件上传" name="1"></el-tab-pane>
-        <el-tab-pane label="素材库" name="2"></el-tab-pane>
-        <el-tab-pane label="图标库" name="3"></el-tab-pane>
-      </el-tabs> -->
+    <el-dialog title="文件管理" :visible.sync="dialogVisible" :close-on-click-modal="false" custom-class="upload-dialog" :close-on-press-escape="false" @close="cancelFunc" :width="dialogWidth" :append-to-body="true">
 
       <div class="upload-wrap-inline mb16 clearfix">
         <div class="leval-item">
           <el-button size="small" icon="el-icon-plus" @click="addCategory">添加分类</el-button>
-          <el-popover
-            placement="bottom"
-            width="200"
-            trigger="click"
-            :value="true">
-             <ul class="move-type">
-               <li v-for="(item,index) in typeList" :key="index"
-                 @click="moveTypeFunc(item.group_id)">
-                 {{item.group_name}}
-               </li>
-             </ul>
-            <el-button size="small"  slot="reference" icon="el-icon-caret-bottom" >移动至</el-button>
+          <el-popover placement="bottom" width="200" trigger="click" :value="true">
+            <ul class="move-type">
+              <li v-for="(item,index) in typeList" :key="index" @click="moveTypeFunc(item.group_id)">
+                {{item.group_name}}
+              </li>
+            </ul>
+            <el-button size="small" slot="reference" icon="el-icon-caret-bottom">移动至</el-button>
           </el-popover>
           <el-button size="small" type="danger" icon="el-icon-delete" @click="deleteFileFunc(false)">批量删除</el-button>
         </div>
         <div class="leval-item upload-btn">
-          <el-upload class="avatar-uploader" multiple ref="upload" action="string" accept="image/jpeg,image/png,image/jpg"
-            :before-upload="onBeforeUploadImage" :http-request="UploadImage" :show-file-list="false" :on-change="fileChange">
-            <el-button size="small" type="primary">点击上传</el-button>
+          <el-upload class="avatar-uploader" multiple ref="upload" action="string" accept="image/jpeg,image/png,image/jpg" :before-upload="onBeforeUploadImage" :http-request="UploadImage" :show-file-list="false" :on-change="fileChange">
+            <el-button size="small" icon="el-icon-upload" type="primary">点击上传</el-button>
           </el-upload>
         </div>
       </div>
@@ -44,8 +26,7 @@
       <div class="fileContainer">
         <div class="file-type">
           <ul>
-            <li :class="activeType==item.group_id?'item active':'item'" v-for="(item,index) in typeList" :key="index"
-              @click="selectTypeFunc(item.group_id)">
+            <li :class="activeType==item.group_id?'item active':'item'" v-for="(item,index) in typeList" :key="index" @click="selectTypeFunc(item.group_id)">
               {{item.group_name}}
               <div class="operation" @click.stop v-if="item.group_id!=null">
                 <p @click="editCategoryFunc(item)"><i class="el-icon-edit"></i></p>
@@ -61,7 +42,7 @@
               <img :scr="item.file_path" :style="'background-image:url('+item.file_path+')'" alt="" />
               <p class="desc">{{ item.real_name }}</p>
               <div class="bottom-shade" @click.stop>
-                <a href="javascript:void(0)"  @click="deleteFileFunc(item)"><i class="el-icon-delete"></i></a>
+                <a href="javascript:void(0)" @click="deleteFileFunc(item)"><i class="el-icon-delete"></i></a>
               </div>
             </li>
           </ul>
@@ -70,14 +51,12 @@
 
       <!--分页-->
       <div class="pagination-wrap">
-        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="curPage"
-          :page-sizes="[12, 24, 36, 42, 48]" :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper"
-          :total="totalDataNumber"></el-pagination>
+        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="curPage" :page-sizes="[12, 24, 36, 42, 48]" :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper" :total="totalDataNumber"></el-pagination>
       </div>
 
       <div slot="footer" class="dialog-footer">
-        <el-button @click="cancelFunc">取 消</el-button>
-        <el-button type="primary" @click="confirmFunc">确 定</el-button>
+        <el-button size="small" @click="cancelFunc">取 消</el-button>
+        <el-button size="small" type="primary" @click="confirmFunc">确 定</el-button>
       </div>
     </el-dialog>
 
@@ -129,17 +108,17 @@
         /*是否显示图片类别编辑框*/
         isShowCategory: false,
         /*当前类别model*/
-        category:null,
-          /*选中图片*/
-            fileIds:[],
+        category: null,
+        /*选中图片*/
+        fileIds: [],
       };
     },
     props: ['config'],
     created() {
       /*覆盖默认值*/
-      if(Object.prototype.toString.call(this.config).toLowerCase() === '[object object]'){
-        for(let key in this.config){
-          this.this_config[key]=this.config[key];
+      if (Object.prototype.toString.call(this.config).toLowerCase() === '[object object]') {
+        for (let key in this.config) {
+          this.this_config[key] = this.config[key];
         }
       }
 
@@ -171,9 +150,9 @@
       },
 
       /*修改类别*/
-      editCategoryFunc(item){
+      editCategoryFunc(item) {
         this.isShowCategory = true;
-        this.category=item;
+        this.category = item;
       },
 
       /*关闭类别层*/
@@ -238,7 +217,7 @@
       },
 
       /*获取图片列表数据*/
-      getData: function() {
+      getData: function () {
         let self = this;
         let param = {
           page: self.curPage,
@@ -256,42 +235,40 @@
       },
 
       /*图片移动到某个类别*/
-      moveTypeFunc(e){
-          let self = this;
-          let fileIds=[];
-          self.fileList.data.forEach(item =>
-          {
-              if (item.selected) {
-                  fileIds.push(item.file_id);
-              }
-          });
-          if(fileIds.length==0){
-              self.$message({
-                  message: '请选择文件',
-                  type: 'warning'
-              });
-              return ;
+      moveTypeFunc(e) {
+        let self = this;
+        let fileIds = [];
+        self.fileList.data.forEach(item => {
+          if (item.selected) {
+            fileIds.push(item.file_id);
           }
-          self.$confirm('确定移动选中的文件吗？, 是否继续?', '提示', {
-              confirmButtonText: '确定',
-              cancelButtonText: '取消',
-              type: 'warning'
-          }).then(() => {
-          FileApi.moveFile({
-              group_id:e,
-              fileIds:fileIds,
-          }, true).then(data => {
-              self.$message({
-                  message: '移动成功',
-                  type: 'success'
-              });
-              self.getFileCategory();
-              self.getData();
-          }).catch(error => {
-              });
-          }).catch(() => {
-
+        });
+        if (fileIds.length == 0) {
+          self.$message({
+            message: '请选择文件',
+            type: 'warning'
           });
+          return;
+        }
+        self.$confirm('确定移动选中的文件吗？, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          FileApi.moveFile({
+            group_id: e,
+            fileIds: fileIds,
+          }, true).then(data => {
+            self.$message({
+              message: '移动成功',
+              type: 'success'
+            });
+            self.getFileCategory();
+            self.getData();
+          }).catch(error => {});
+        }).catch(() => {
+
+        });
       },
 
       /*选择上传图片*/
@@ -302,12 +279,12 @@
       /*选择图片之前*/
       onBeforeUploadImage(file) {
         const isIMAGE = file.type === 'image/jpeg' || 'image/jpg' || 'image/png';
-        const isLt1M = file.size / 1024 / 1024 < 1;
+        const isLt1M = file.size / 1024 / 1024 < 2;
         if (!isIMAGE) {
           this.$message.error('上传文件只能是图片格式!');
         }
         if (!isLt1M) {
-          this.$message.error('上传文件大小不能超过 1MB!');
+          this.$message.error('上传文件大小不能超过 2MB!');
         }
         return isIMAGE && isLt1M;
       },
@@ -377,10 +354,10 @@
             spinner: 'el-icon-loading',
             background: 'rgba(0, 0, 0, 0.7)'
           });
-          let temp_list=[];
-          if(e){
+          let temp_list = [];
+          if (e) {
             temp_list.push(e.file_id);
-          }else{
+          } else {
             for (let i = 0; i < self.fileList.data.length; i++) {
               let item = self.fileList.data[i];
               if (item.selected) {
@@ -389,8 +366,8 @@
             }
           }
           FileApi.deleteFiles({
-            fileIds:temp_list
-          }, true)
+              fileIds: temp_list
+            }, true)
             .then(data => {
               loading.close();
               self.$message({
@@ -403,18 +380,18 @@
               loading.close();
             });
         }).catch(() => {
-              loading.close();
-              self.$message({
-                message: '删除失败',
-                type: 'warning'
-              });
+          loading.close();
+          self.$message({
+            message: '删除失败',
+            type: 'warning'
+          });
         });
       },
 
       /*选择图片确认*/
       confirmFunc() {
         let list = [];
-        let leng=0;
+        let leng = 0;
         for (let i = 0; i < this.fileList.data.length; i++) {
           let item = this.fileList.data[i];
           if (item.selected) {
@@ -425,7 +402,7 @@
             list.push(obj);
             leng++;
           }
-          if(leng>this.this_config.total){
+          if (leng > this.this_config.total) {
             break;
           }
         }
@@ -438,6 +415,7 @@
       }
     }
   };
+
 </script>
 
 <style lang="scss">
@@ -551,7 +529,10 @@
     transform: all 0.2s ease-out 0s;
     color: #FFFFFF;
   }
-  .fileContainer .bottom-shade a{ color:#FFFFFF;}
+
+  .fileContainer .bottom-shade a {
+    color: #FFFFFF;
+  }
 
   .fileContainer .selectedIcon {
     width: 20px;
@@ -565,17 +546,25 @@
     cursor: pointer;
   }
 
-  // :focus {
-  //   outline: -webkit-focus-ring-color auto 1px;
-  // }
-
   .upload-dialog .pagination-wrap {
     margin-top: 16px;
     text-align: right;
   }
 
-  .move-type{ max-height: 200px; overflow-y: auto;}
-  .move-type li{ padding: 0 10px; height:30px; line-height: 30px; cursor:pointer;}
-  .move-type li:hover{ background: #c6e2ff;}
+  .move-type {
+    max-height: 200px;
+    overflow-y: auto;
+  }
+
+  .move-type li {
+    padding: 0 10px;
+    height: 30px;
+    line-height: 30px;
+    cursor: pointer;
+  }
+
+  .move-type li:hover {
+    background: #c6e2ff;
+  }
 
 </style>

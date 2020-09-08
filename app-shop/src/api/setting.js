@@ -10,6 +10,13 @@ let SettingApi = {
   editStore(data, errorback) {
     return request._post('settings.store/index', data, errorback);
   },
+  /*小程序模板变量*/
+  xcxDetail(data, errorback) {
+    return request._post('settings.xcx/fetchData', data, errorback);
+  },
+  editXcx(data, errorback) {
+    return request._post('settings.xcx/index', data, errorback);
+  },
   /*交易设置模板变量*/
   tradeDetail(data, errorback) {
     return request._post('settings.trade/fetchData', data, errorback);

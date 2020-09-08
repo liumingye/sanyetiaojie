@@ -24,6 +24,3 @@
     methods: {}
   };
 </script>
-
-<style>
-</style>

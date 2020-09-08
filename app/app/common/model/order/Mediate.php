@@ -18,18 +18,12 @@ class Mediate extends BaseModel
 
     //追加字段
     protected $append = [
-        'state_text', // 售后单状态文字描述
+        'state_text', // 状态文字描述
     ];
 
-    /**
-     * 订单模型初始化
-     */
-    public static function init()
-    {
-        parent::init();
-        $model = new static;
-        event('Order', $model);
-    }
+    protected $type = [
+        'court_time'    =>  'timestamp:Y-m-d H:i:s',
+    ];
 
     /**
      * 关联用户表
@@ -63,30 +57,19 @@ class Mediate extends BaseModel
         return $this->hasMany('app\\common\\model\\order\\MediateImage', 'mid', 'id')->order(['id' => 'asc']);
     }
 
-    // public function committee()
-    // {
-    //     return $this->hasMany('app\\shop\\model\\order\\MediateCommittee', 'mid', 'id');
-    // }
-
-    // public function lawyer()
-    // {
-    //     return $this->hasMany('app\\shop\\model\\order\\MediateLawyer', 'mid', 'id');
-    // }
-
     /**
-     * 订单状态文字描述
+     * 状态文字描述
      */
     public function getStateTextAttr($value, $data)
     {
-        // 付款状态
         if ($data['status'] == 1) {
             return '待受理';
-        }
-        // 订单类型：单独购买
-        else if ($data['status'] == 2) {
+        } else if ($data['status'] == 2) {
             return '调解中';
         } else if ($data['status'] == 3) {
             return '已调解';
+        } else if ($data['status'] == 4) {
+            return '调解失败';
         }
         return $value;
     }
@@ -126,7 +109,7 @@ class Mediate extends BaseModel
     /**
      * 获取列表
      */
-    public function getList($uid)
+    public function getList($uid, $status = 0)
     {
         $model = $this;
         $params = [
@@ -134,12 +117,25 @@ class Mediate extends BaseModel
         ];
         //搜索手机号
         $model = $model->where('uid', '=', trim($uid));
+        $filter = [];
+        switch ($status) {
+            case 1:
+                $filter['status'] = 1;
+                break;
+            case 2:
+                $filter['status'] = 2;
+                break;
+            case 3:
+                $filter['status'] = 3;
+                break;
+        }
         // 获取数据列表
         return $model
-            ->field('id,cid,no,name,mobile,idcard,appeal,other_name,other_phone,text,area,address,times,create_time,way,status')
+            ->field('id,cid,no,name,mobile,idcard,my_address,appeal,other_name,other_phone,other_address,text,area,address,times,create_time,way,status')
             ->with(['category' => function ($query) {
                 $query->field('category_id,name');
             }])
+            ->where($filter)
             ->order(['create_time' => 'desc'])
             ->paginate($params, false, [
                 'query' => \request()->request(),
@@ -160,7 +156,7 @@ class Mediate extends BaseModel
         $model = $model->whereOr('no', '=', trim($phone));
         // 获取数据列表
         return $model
-            ->field('id,cid,no,name,mobile,idcard,appeal,other_name,other_phone,text,area,address,times,create_time,status')
+            ->field('id,cid,no,name,mobile,idcard,my_address,appeal,other_name,other_phone,other_address,text,area,address,times,create_time,status')
             ->with(['category' => function ($query) {
                 $query->field('category_id,name');
             }])
@@ -179,9 +175,9 @@ class Mediate extends BaseModel
         $model = $model->where(['id' => trim($id), 'no' => trim($no)]);
         // 获取数据列表
         $data = $model
-            ->field('id,cid,no,name,mobile,idcard,appeal,other_name,other_phone,text,area,address,times,create_time,status')
+            ->field('id,cid,no,name,mobile,idcard,my_address,appeal,other_name,other_phone,other_address,text,area,address,times,create_time,status')
             ->with(['info' => function ($query) {
-                $query->field('mid,text,status,create_time')->order('create_time desc');
+                $query->field('mid,text,times,status,create_time')->order('create_time desc');
             }, 'category' => function ($query) {
                 $query->field('category_id,name');
             }])
@@ -192,8 +188,8 @@ class Mediate extends BaseModel
                 $time = strtotime($vo['create_time']);
                 $vo['date'] = date('Y-m-d', $time);
                 $week = date('N', $time);
-                $weekarray = array("日", "一", "二", "三", "四", "五", "六");
-                $vo['week'] = '周' . $weekarray[$week];
+                $weekarray = array("一", "二", "三", "四", "五", "六", "日");
+                $vo['week'] = '周' . $weekarray[$week - 1];
                 $vo['time'] = date('H:i:s', $time);
                 $vo['state_text'] = $this->getStateTextAttr($vo['status'], ['status' => $vo['status']]);
                 unset($vo['mid']);

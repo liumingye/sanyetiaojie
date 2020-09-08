@@ -19,11 +19,10 @@ class Law extends BaseModel
             'category_id' => '0',
             'text' => '',
             'list_rows' => 28,
-            'field' => '*'
+            'field' => '*',
+            'status' => 0
         ], $param);
-
         // 筛选条件
-        $filter = [];
         if ($params['category_id'] > 0) {
             $model = $model->where('category_id', $params['category_id']);
         }
@@ -32,33 +31,46 @@ class Law extends BaseModel
             $model = $model
                 ->where('title', 'like', $params['text']);
         }
-
+        if ($params['status'] > 0) {
+            $model = $model->where('status', $params['status']);
+        }
+        // 开始查询
         $list = $model
             ->field($params['field'])
-            ->where($filter)
             ->order('id desc')
             ->paginate($params, false, [
                 'query' => \request()->request(),
             ]);
-
         // 整理列表数据并返回
         return $list;
     }
 
-    public function getInfo($id)
+    public function getInfo($param)
     {
-        $model = $this->where('id', '=', $id)
+        // 默认搜索条件
+        $params = array_merge([
+            'field' => '*',
+            'status' => 0
+        ], $param);
+        $model = $this;
+        // 筛选条件
+        if ($params['status'] > 0) {
+            $model = $model->where('status', $params['status']);
+        }
+        // 开始查询
+        $model = $model
+            ->where('id', $params['id'])
+            ->field($params['field'])
             ->find();
         if (empty($model)) {
             return $model;
         }
-        // 整理商品数据并返回
+        // 整理数据并返回
         return $model;
     }
-    
+
     public static function detail($id)
     {
         return self::find($id);
     }
-
 }

@@ -6,6 +6,13 @@ use app\common\model\user\Feedback as FeedbackModel;
 
 class Feedback extends FeedbackModel
 {
+    /**
+     * 隐藏字段
+     */
+    protected $hidden = [
+        'app_id',
+        'update_time',
+    ];
 
     public function getList($params = null)
     {
@@ -26,6 +33,13 @@ class Feedback extends FeedbackModel
             ->paginate($params, false, [
                 'query' => \request()->request(),
             ]);
+    }
+
+    /* 获取详情 */
+    public static function detail($where, $with = [])
+    {
+        is_array($where) ? $filter = $where : $filter['id'] = (int) $where;
+        return self::with($with)->find($where);
     }
 
     public function getFeedbackTotal($where = [])

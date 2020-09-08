@@ -1,9 +1,4 @@
 <template>
-  <!--
-          作者：luoyiming
-          时间：2019-10-25
-          描述：用户列表
-      -->
   <div class="user">
     <!--搜索表单-->
     <div class="common-seach-wrap">
@@ -21,14 +16,14 @@
     <!--内容-->
     <div class="user-content">
       <div class="table-wrap">
-        <el-table :data="tableData" size="small" border style="width: 100%" v-loading="loading">
-          <el-table-column prop="nickName" label="头像" width="50">
+        <el-table :data="tableData" size="small" style="width: 100%" v-loading="loading">
+          <el-table-column prop="user_id" label="ID" width="80"></el-table-column>
+          <el-table-column prop="nickName" label="昵称"></el-table-column>
+          <el-table-column prop="nickName" label="头像">
             <template slot-scope="scope">
-              <img class="user-photo" :src="scope.row.avatarUrl" />
+              <img :src="scope.row.avatarUrl" width="30px" height="30px" />
             </template>
           </el-table-column>
-          <el-table-column prop="user_id" label="ID"></el-table-column>
-          <el-table-column prop="nickName" label="昵称"></el-table-column>
           <el-table-column prop="gender" label="性别">
             <template slot-scope="scope">
               {{ scope.row.gender | convertSex }}
@@ -37,10 +32,11 @@
           <el-table-column prop="country" label="国家"></el-table-column>
           <el-table-column prop="province" label="省份"></el-table-column>
           <el-table-column prop="city" label="城市"></el-table-column>
+          <el-table-column prop="mobile" label="手机号"></el-table-column>
           <el-table-column prop="create_time" label="注册时间" width="140"></el-table-column>
-          <el-table-column fixed="right" label="操作" width="50">
+          <el-table-column fixed="right" align="right" width="100px">
             <template slot-scope="scope">
-              <el-button @click="deleteClick(scope.row)" type="text" size="small" v-auth="'/member/member/delete'">删除</el-button>
+              <el-button @click="deleteClick(scope.row)" size="mini" type="danger" v-auth="'/member/member/delete'">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -172,6 +168,3 @@ export default {
   }
 };
 </script>
-<style scoped="">
-  .user-photo{ width: 30px; height: 30px; border-radius: 50%;}
-</style>

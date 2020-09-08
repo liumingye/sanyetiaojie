@@ -4,7 +4,7 @@
     <el-form size="small" ref="form" :model="form" label-width="100px">
       <div class="basic-setting-content pl16 pr16">
         <!--基本信息-->
-        <div class="common-form">编辑新闻</div>
+        <div class="common-form">编辑问题</div>
         <el-form-item label="标题：" :rules="[{required: true,message: ' '}]" prop="model.title">
           <el-input v-model="form.model.title" class="max-w460"></el-input>
         </el-form-item>
@@ -16,8 +16,8 @@
       </div>
       <!--提交-->
       <div class="common-button-wrapper">
-          <el-button type="info" size="small" @click="cancelFunc">取消</el-button>
-          <el-button type="primary" size="small" @click="onSubmit" :loading="loading">发布</el-button>
+        <el-button type="info" size="small" @click="cancelFunc">取消</el-button>
+        <el-button type="primary" size="small" @click="onSubmit" :loading="loading">发布</el-button>
       </div>
 
     </el-form>
@@ -36,20 +36,16 @@
         ueditor: {
           config: {
             initialFrameWidth: '100%',
-            initialFrameHeight: 500,
+            initialFrameHeight: 700,
           }
         },
-        /*切换菜单*/
-        activeIndex: '1',
         loading: false,
         /*form表单数据*/
         form: {
           model: {
             title: '',
             text: '',
-            category_id: ''
           },
-          category: []
         },
       };
     },
@@ -58,12 +54,12 @@
       this.getData();
     },
     methods: {
-      getData: function(){
+      getData: function () {
         let self = this;
         self.loading = true;
         QuestionsApi.getQuestions({
-          id: this.$route.query.id
-        }, true)
+            id: this.$route.query.id
+          }, true)
           .then(data => {
             self.loading = false;
             Object.assign(self.form.model, data.data);
@@ -74,7 +70,7 @@
           });
       },
       /*提交*/
-      onSubmit: function() {
+      onSubmit: function () {
         let self = this;
         self.form.model.text = self.$refs.ue.getUEContent();
         let params = self.form.model;
@@ -96,12 +92,13 @@
       },
 
       /*取消*/
-      cancelFunc(){
+      cancelFunc() {
         this.$router.go(-1);
       }
 
     }
   };
+
 </script>
 
 <style lang="scss" scoped>
@@ -112,4 +109,5 @@
     line-height: 20px;
     color: #2c3e50;
   }
+
 </style>

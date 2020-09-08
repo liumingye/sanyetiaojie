@@ -2,8 +2,6 @@
 
 namespace app\common\model;
 
-use app\common\exception\BaseException;
-use think\facade\Env;
 use think\Model;
 
 /**
@@ -54,7 +52,7 @@ class BaseModel extends Model
      */
     protected static function setShopAppId()
     {
-        $session = session('jjjshop_store');
+        $session = session('sy_store');
         self::$app_id = $session['app']['app_id'];
     }
 

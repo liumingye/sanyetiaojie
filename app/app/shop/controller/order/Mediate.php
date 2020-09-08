@@ -5,15 +5,25 @@ namespace app\shop\controller\order;
 use app\shop\controller\Controller;
 use app\shop\model\order\Mediate as MediateModel;
 use app\shop\model\product\Category as CategoryModel;
-use app\shop\model\support\Lawyer as LawyerModel;
 use app\shop\model\auth\User as UserModel;
-use app\shop\model\order\MediateCommittee as MediateCommitteeModel;
-use app\shop\model\order\MediateLawyer as MediateLawyerModel;
+use app\shop\model\order\MediateRelation as MediateRelationModel;
+use app\api\model\order\MediateInfo as MediateInfoModel;
+use app\shop\model\notice\Notice as NoticeModel;
 use app\common\model\BaseModel;
 
 
 class Mediate extends Controller
 {
+
+    public function getNotice($id)
+    {
+        $data = (new NoticeModel)->field('id')->where('mid', $id)->find();
+        if ($data) {
+            return $this->renderSuccess('', $data);
+        }
+        return $this->renderError('未找到消息');
+    }
+
     /**
      * 列表
      */
@@ -26,13 +36,13 @@ class Mediate extends Controller
 
         // 列表
         $model = new MediateModel();
-        $role = $this->store['user']['role'];
-        if ($role == 1 || $role == 2) {
-            $list = $model->getListByRole($type, $this->postData(), $role);
+        $user = $this->store['user'];
+        if ($user['role'] == 1 || $user['role'] == 2) {
+            $list = $model->getList($type, $this->postData(), $user);
             $order_count = [
                 'order_count' => [
-                    'accepting' => $model->getCountByRole('accepting', $role),
-                    'adjusting' => $model->getCountByRole('adjusting', $role),
+                    'accepting' => $model->getCountByRole('accepting', $user),
+                    'adjusting' => $model->getCountByRole('adjusting', $user),
                 ],
             ];
         } else {
@@ -55,17 +65,36 @@ class Mediate extends Controller
     }
 
     /**
+     * 编辑详情
+     */
+    public function editInfo($id, $name, $value = '')
+    {
+        if ((new MediateModel)->editInfo($id, $name, $value)) {
+            return $this->renderSuccess('保存成功');
+        }
+        return $this->renderError('保存失败');
+    }
+
+    /**
      * 详情
      */
     public function detail($id)
     {
-        $detail = MediateModel::detail($id,['user', 'image.file', 'info'=> function ($query) {
-            $query->field('mid,text,status,create_time')->order('create_time desc');
+        $detail = MediateModel::detail($id, ['user' => function ($query) {
+            $query->field('user_id,nickName');
+        }, 'image.file', 'info' => function ($query) {
+            $query->field('id,mid,text,times,status,create_time')->order('create_time desc');
         }]);
         return $this->renderSuccess('', compact('detail'));
     }
 
-    /* 设置进度 */
+    /**
+     * 设置进度 
+     * 0 未选择调解方式
+     * 1 电话调解
+     * 2 律师调解
+     * 3 律师调解确认人员
+     */
     public function setWay($id, $way)
     {
         if (!request()->isPost()) {
@@ -77,7 +106,17 @@ class Mediate extends Controller
             if ($way == 0) {
                 $model->status = 1;
             } else {
+                if ($way == 1) {
+                    // 电话调解加进度
+                    (new MediateInfoModel)->add([
+                        'mid' => $id,
+                        'text' => '电话调解中',
+                        'status' => 2
+                    ]);
+                    (new NoticeModel)->sendMediateNotice($id,  '正在进行电话调解中');
+                }
                 $model->status = 2;
+                (new NoticeModel)->sendSystemNotice($model->uid, '您有一个正在纠纷调解中');
             }
             if ($model->save()) {
                 return $this->renderSuccess('提交成功');
@@ -98,28 +137,41 @@ class Mediate extends Controller
         if ($model) {
             $model->status = 3;
             if ($model->save()) {
+                (new MediateInfoModel)->add([
+                    'mid' => $id,
+                    'text' => '双方和解，调解成功',
+                    'status' => 3
+                ]);
+                (new NoticeModel)->sendSystemNotice($model->uid, '您有一个纠纷已调解成功');
+                (new NoticeModel)->sendMediateNotice($id,  '案件已调解成功');
                 return $this->renderSuccess('提交成功');
             }
             return $this->renderError($model->getError() ?: '提交失败');
-        } else {
-            return $this->renderError('提交失败');
         }
+        return $this->renderError('提交失败');
     }
 
-    /* 搜索律师 */
-    public function searchLawyer($text)
+    /* 调解失败 */
+    public function setFail($id, $type)
     {
-        $lawyer = (new LawyerModel)->getList([
-            'text' => $text
-        ]);
-        return $this->renderSuccess('', $lawyer);
-    }
-
-    /* 搜索委员会 */
-    public function searchCommittee($text)
-    {
-        $data['data'] = (new UserModel)->where('real_name', 'LIKE', "%{$text}%")->where('role', 1)->limit(40)->select();
-        return $this->renderSuccess('', $data);
+        if ($this->setWay($id, 0)) {
+            $text = '';
+            if ($type == 1) {
+                $text = '电话';
+            } elseif ($type == 2) {
+                $text = '委员会';
+            }
+            $text .= '调解失败';
+            (new NoticeModel)->sendMediateNotice($id,  $text);
+            (new MediateInfoModel)->add([
+                'mid' => $id,
+                'text' => $text,
+                'status' => 4
+            ]);
+            (new MediateModel)->where('id', $id)->inc('times')->update();
+            return $this->renderSuccess('提交成功');
+        }
+        return $this->renderError('提交失败');
     }
 
     /* 设置人员 */
@@ -127,26 +179,56 @@ class Mediate extends Controller
     {
         $data = $this->postData();
         $id = $data['id'];
-        $lawyer = isset($data['lawyer']) ? $data['lawyer'] : [];
-        $committee = isset($data['committee']) ? $data['committee'] : [];
-        if (count($committee) == 0) {
-            return $this->renderError('请选择委员会');
+        $userlist = isset($data['userlist']) ? $data['userlist'] : [];
+
+        $model = new MediateRelationModel;
+        $model->where('mid', $id)->delete();
+        $role1 = []; // 委员会
+        $role2 = []; // 律师
+        if (count($userlist) > 0) {
+            $res = (new UserModel)->field('real_name,role')->where('shop_user_id', 'IN', $userlist)->select();
+            if ($res) {
+                foreach ($res as $vo) {
+                    if ($vo['role'] == 1) {
+                        $role1[] = $vo['real_name'];
+                    } elseif ($vo['role'] == 2) {
+                        $role2[] = $vo['real_name'];
+                    }
+                }
+            }
+            $model->addAll($id, $userlist);
+        } else {
+            return $this->renderError('请设置人员');
         }
-        $model1 = new MediateLawyerModel;
-        $model1->where('mid', $id)->delete();
-        $model2 = new MediateCommitteeModel;
-        $model2->where('mid', $id)->delete();
-        if (count($lawyer) > 0) {
-            $model1->addAll($id, $lawyer);
+        if (count($role1) > 0 || count($role2) > 0) {
+            // 律师调解加进度
+            $text = '';
+            if (count($role1) > 0) {
+                $text .= '调解员：' . implode(",", $role1);
+            }
+            if (count($role2) > 0) {
+                if ($text != '') {
+                    $text .= ' ';
+                }
+                $text .= '律师：' . implode(",", $role2);
+            }
+            $text =  '已分配 ' . $text . ' 负责此案件调解';
+            (new MediateInfoModel)->add([
+                'mid' => $id,
+                'text' => $text,
+                'status' => 2
+            ]);
+            (new NoticeModel)->sendMediateNotice($id,  $text);
+        } else {
+            return $this->renderError('人员选择错误');
         }
-        if (count($committee) > 0) {
-            $model2->addAll($id, $committee);
-        }
-        if (count($lawyer) > 0 || count($committee) > 0) {
-            $this->setWay($id, 3);
-            return $this->renderSuccess('设置成功');
-        }
-        return $this->renderError('设置失败');
+        $model = MediateModel::find($id);
+        $model->save([
+            'court_time' => isset($data['court_time']) ? $data['court_time'] : '',
+            'court_address' => isset($data['court_address']) ? $data['court_address'] : '',
+        ]);
+        $this->setWay($id, 3);
+        return $this->renderSuccess('设置成功');
     }
 
     /* 获取WORD */
@@ -164,16 +246,20 @@ class Mediate extends Controller
             $name = "结案书";
         }
         // 详情
+        $mediate = new MediateModel;
         $detail = array_merge([
+            'no' => '',
             'create_time' => '',
+            'update_time' => '',
             'name' => '',
             'idcard' => '',
-            'address' => '',
+            'my_address' => '',
             'mobile' => '',
             'other_name' => '',
+            'other_address' => '',
             'text' => '',
             'appeal' => ''
-        ], MediateModel::detail($id)->toArray());
+        ], $mediate->detail($id)->append(['update_time'])->toArray());
         // 分类
         $cat = [
             'name' => ''
@@ -183,34 +269,24 @@ class Mediate extends Controller
         if (isset($category[$detail['cid']])) {
             $cat = $category[$detail['cid']];
         }
-        // 委员会
-        $com = [
-            'real_name' => ''
-        ];
-        $committee = (new MediateCommitteeModel)
-            ->where('mid', $id)
-            ->join('shop_user', 'uid = shop_user_id')
-            ->find();
-        if ($committee) {
-            $com = $committee;
-        }
         // 打开word
         $dir = str_replace('\\', '/', root_path());
         $source = $dir . "app/upload/word/{$word}";
         $tmp = new \PhpOffice\PhpWord\TemplateProcessor($source);
         // 设置word文字
         if ($type == 1) {
+            $tmp->setValue('no', $detail['no']);
             $tmp->setValue('time', $detail['create_time']);
             $tmp->setValue('name', $detail['name']);
             $tmp->setValue('category', $cat['name']);
             $tmp->setValue('idcard', $detail['idcard']);
-            $tmp->setValue('address', $detail['address']);
+            $tmp->setValue('my_address', $detail['my_address']);
             $tmp->setValue('mobile', $detail['mobile']);
             $tmp->setValue('other_name', $detail['other_name']);
             $tmp->setValue('other_phone', $detail['other_phone']);
+            $tmp->setValue('other_address', $detail['other_address']);
             $tmp->setValue('text', $detail['text']);
             $tmp->setValue('appeal', $detail['appeal']);
-            $tmp->setValue('committee', $com['real_name']);
             $tmp->setValue('date', date('Y-m-d'));
         } elseif ($type == 2) {
             $tmp->setValue('no', $detail['no']);
@@ -221,14 +297,54 @@ class Mediate extends Controller
         // 创建文件夹
         $dir = iconv("UTF-8", "GBK", root_path() . "public/" . $fileFolder);
         if (!file_exists($dir)) {
-            echo '11';
             mkdir($dir, 0777, true);
         }
         // 生成WORD
-        $fileName = "{$id}-{$name}.docx";
-        $fileUrl = $fileFolder . substr(md5($fileName . "liumingye"), 8, 16) . "-" . $fileName;
+        $fileName = "{$detail['no']}-{$name}.docx";
+        $fileUrl = $fileFolder . $fileName;
         $tmp->saveAs($fileUrl);
         return redirect(base_url() . $fileUrl);
     }
 
+    /* 添加进度 */
+    public function addSchedule($id, $text, $status = 2, $time, $sendNotice = false)
+    {
+        $mediateInfoModel = new MediateInfoModel;
+        $mediateInfo = $mediateInfoModel->field('times')->where('mid', $id)->where('create_time', '<', strtotime($time))->limit(1)->order('create_time desc')->find();
+        $times = 1;
+        if (isset($mediateInfo['times'])) {
+            $times = $mediateInfo['times'];
+        } else {
+            $mediateModel = new MediateModel;
+            $mediate = $mediateModel->field('times')->where('id', $id)->find();
+            if (isset($mediate['times'])) {
+                $times = $mediate['times'];
+            }
+        }
+        $res = $mediateInfoModel->add([
+            'mid' => $id,
+            'text' => $text,
+            'times' => $times,
+            'status' => $status,
+            'create_time' => strtotime($time)
+        ]);
+        if ($res) {
+            // 自动发送一条通知
+            if ($sendNotice == 'true') {
+                (new NoticeModel)->sendMediateNotice($id,  $text);
+            }
+            return $this->renderSuccess('添加成功');
+        }
+        return $this->renderError('添加失败');
+    }
+
+    /* 删除进度 */
+    public function delSchedule($id)
+    {
+        $model = MediateInfoModel::detail($id);
+        if (!$model->remove()) {
+            return $this->renderError($model->getError() ?: '删除失败');
+        }
+        return $this->renderSuccess('删除成功');
+    }
 }

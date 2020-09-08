@@ -1,35 +1,42 @@
 <template>
   <div class="user">
-    <!--添加管理员-->
+    <!--添加人员-->
     <div class="common-level-rail">
-      <el-button size="small" type="primary" icon="el-icon-plus" @click="addClick" v-auth="'/auth/user/add'">添加管理员</el-button>
+      <el-button size="small" type="primary" icon="el-icon-plus" @click="addClick" v-auth="'/auth/user/add'">添加人员</el-button>
     </div>
 
     <!--内容-->
     <div class="product-content">
       <div class="table-wrap">
-        <el-table size="small" :data="tableData" border style="width: 100%" v-loading="loading">
-          <el-table-column prop="shop_user_id" label="管理员ID"></el-table-column>
+        <el-table size="small" :data="tableData" style="width: 100%" v-loading="loading">
+          <el-table-column prop="shop_user_id" label="人员ID"></el-table-column>
           <el-table-column prop="user_name" label="用户名"></el-table-column>
           <el-table-column prop="real_name" label="姓名"></el-table-column>
           <el-table-column prop="role.role_name" label="所属角色">
             <template slot-scope="scope">
-              <div class="red" v-if="scope.row.role == 0">
+              <el-tag size="medium">
+              <div v-if="scope.row.role == 0">
                 超级管理员
               </div>
-              <div class="gray green" v-if="scope.row.role == 1">
+              <div v-if="scope.row.role == 1">
                 委员会
               </div>
-              <div class="gray" v-if="scope.row.role == 2">
+              <div v-if="scope.row.role == 2">
                 律师
               </div>
+              </el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column label="所属分组">
+            <template slot-scope="scope">
+              {{ groupText(scope.row.gid) }}
             </template>
           </el-table-column>
           <el-table-column prop="create_time" label="添加时间"></el-table-column>
-          <el-table-column fixed="right" label="操作" width="90">
+          <el-table-column fixed="right" align="right" width="150px">
             <template slot-scope="scope">
-              <el-button v-if="scope.row.shop_user_id != 1" @click="editClick(scope.row)" type="text" size="small" v-auth="'/auth/user/edit'">编辑</el-button>
-              <el-button v-if="scope.row.shop_user_id != 1 && scope.row.role != 2" @click="deleteClick(scope.row)" type="text" size="small" v-auth="'/auth/user/delete'">删除</el-button>
+              <el-button v-if="scope.row.shop_user_id != 1" @click="editClick(scope.row)" size="mini" v-auth="'/auth/user/edit'">编辑</el-button>
+              <el-button v-if="scope.row.shop_user_id != 1" @click="deleteClick(scope.row)" size="mini" type="danger" v-auth="'/auth/user/delete'">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -41,17 +48,17 @@
       </div>
     </div>
 
-    <Add :open="open_add" :roleList="roleList" @close="closeAdd"></Add>
+    <Add :open="open_add" @close="closeAdd"></Add>
 
-    <Edit :open="open_edit" :roleList="roleList" :shop_user_id="curModel.shop_user_id" @close="closeEdit"></Edit>
+    <Edit :open="open_edit" :shop_user_id="curModel.shop_user_id" @close="closeEdit"></Edit>
 
   </div>
 </template>
 
 <script>
   import AuthApi from '@/api/auth.js';
-  import Add from './dialog/Add.vue';
-  import Edit from './dialog/Edit.vue';
+  import Add from './dialog/add.vue';
+  import Edit from './dialog/edit.vue';
   export default {
     components: {
       Add,
@@ -82,15 +89,41 @@
         /*当前编辑的对象*/
         curModel: {},
         /*角色列表*/
-        roleList: []
+        roleList: [],
+        groupList: []
       };
     },
     created() {
       /*获取列表*/
+      this.getBaseData();
       this.getTableList();
-    //   this.getAllrole();
     },
     methods: {
+      groupText: function (id) {
+        for (var i = 0; i < this.groupList.length; i++) {
+          if (this.groupList[i].id == id) {
+            return this.groupList[i].text;
+          }
+        }
+      },
+      /**
+       * 获取基础数据
+       */
+      getBaseData: function () {
+        let self = this;
+        self.loading = true;
+        AuthApi.userGroup({}, true)
+          .then(data => {
+            self.loading = false;
+            self.groupList = [{
+              id: 0,
+              text: '无分组'
+            }].concat(data.data.list.data);
+          })
+          .catch(error => {
+            self.loading = false;
+          });
+      },
       /*选择第几页*/
       handleCurrentChange(val) {
         let self = this;
@@ -187,5 +220,3 @@
   };
 
 </script>
-
-<style></style>

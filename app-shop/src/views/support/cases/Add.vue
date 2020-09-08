@@ -27,6 +27,15 @@
             class="max-w460">
           </el-date-picker>
         </el-form-item>
+        <el-form-item label="来源：" prop="model.source">
+          <el-input v-model="form.model.source" class="max-w460"></el-input>
+        </el-form-item>
+        <el-form-item label="公开度：" :rules="[{required: true,message: ' '}]" prop="model.status">
+          <el-select v-model="form.model.status" placeholder="请选择">
+            <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
         <el-form-item label="内容：" :rules="[{required: true,message: ' '}]">
           <div class="edit_container">
             <Uediter :text="ueditor.text" :config="ueditor.config" ref="ue"></Uediter>
@@ -56,7 +65,7 @@
           text: '',
           config: {
             initialFrameWidth: '100%',
-            initialFrameHeight: 500,
+            initialFrameHeight: 700,
           }
         },
         /*切换菜单*/
@@ -69,10 +78,19 @@
             text: '',
             court: '',
             date: '',
+            source: '',
+            status: 1,
             category_id: ''
           },
           category: []
         },
+        options: [{
+          value: 1,
+          label: '公开'
+        }, {
+          value: 2,
+          label: '隐藏'
+        }]
       };
     },
     created() {

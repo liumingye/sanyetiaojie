@@ -4,7 +4,9 @@ import {
   getSessionStorage
 } from '@/utils/base'
 import getRolelist from './getRolelist.js'
-import getBaseRouter, { errpage } from '@/router/baseRouter.js'
+import {
+  errpage
+} from '@/router/baseRouter.js'
 
 import {
   cearedRoute
@@ -13,8 +15,6 @@ import {
   createdAuth
 } from '@/utils/createdAuth'
 
-
-const menu = getBaseRouter;
 
 const user = {
 
@@ -51,13 +51,15 @@ const user = {
   /*可异步改变*/
   actions: {
 
-    generateRoutes: async function(context, str) {
-      /*返回理由*/
+    generateRoutes: function (context, str) {
+      /*返回*/
       return new Promise((resolve, reject) => {
+        const menu = [];
         /*判断本地缓存是否有菜单数据*/
         let rolelist = getSessionStorage('rolelist');
         let routerlist = null;
         if (rolelist) {
+          /*本地缓存有数据，直接获取缓存里的数据*/
           let auth = getSessionStorage('authlist');
           if (!auth) {
             let authlist = {}
@@ -72,6 +74,7 @@ const user = {
           });
           resolve(routerlist);
         } else {
+          /*本地缓存没有数据，去掉菜单接口*/
           getRolelist().then(res => {
               let list = cearedRoute(res);
               routerlist = menu.concat(list, errpage);
@@ -94,6 +97,5 @@ const user = {
 
   }
 }
-
 
 export default user;

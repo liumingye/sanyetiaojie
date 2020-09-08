@@ -20,8 +20,9 @@ class AccessRole extends AccessRoleModel
         $all = array_column($all, 'aid');
         $res = (new AccessModel)
             ->withoutGlobalScope()->where('access_id', 'IN', $all)
+            ->hidden(['url', 'create_time', 'update_time', 'is_show'])
             ->where(['is_show' => 1])
-            ->order('sort')
+            ->order(['sort' => 'asc', 'create_time' => 'asc'])
             ->select()
             ->toArray();
         $res = (new AccessModel)->recursiveMenuArray($res, 0);

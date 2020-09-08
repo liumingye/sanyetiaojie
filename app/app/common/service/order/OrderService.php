@@ -71,5 +71,4 @@ class OrderService
         }
         return $models[$orderType];
     }
-
 }

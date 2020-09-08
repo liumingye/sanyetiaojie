@@ -11,7 +11,7 @@ use app\shop\model\product\Category as CategoryModel;
 class Category extends Controller
 {
     /**
-     * 商品分类列表
+     * 分类列表
      */
     public function index()
     {
@@ -21,7 +21,7 @@ class Category extends Controller
     }
 
     /**
-     * 删除商品分类
+     * 删除分类
      */
     public function delete($category_id)
     {
@@ -33,7 +33,7 @@ class Category extends Controller
     }
 
     /**
-     * 添加商品分类
+     * 添加分类
      */
     public function add()
     {
@@ -46,7 +46,7 @@ class Category extends Controller
     }
 
     /**
-     * 编辑商品分类
+     * 编辑分类
      */
     public function edit($category_id)
     {

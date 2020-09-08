@@ -18,8 +18,8 @@ Vue.component('Icon', Icon)
 /*引用element ui*/
 Vue.use(ElementUI)
 /*全局需要的过滤方法-视图用*/
-for(let key in filters){
-	Vue.filter(key,filters[key])
+for (let key in filters) {
+  Vue.filter(key, filters[key])
 }
 /*全局需要的过滤方法-方法用*/
 Vue.prototype.$filter = filters
@@ -31,6 +31,8 @@ new Vue({
   el: '#app',
   router,
   store,
-  components: { App },
+  components: {
+    App
+  },
   template: '<App/>'
 })

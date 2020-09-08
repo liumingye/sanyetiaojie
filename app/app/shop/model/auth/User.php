@@ -3,6 +3,7 @@
 namespace app\shop\model\auth;
 
 use app\common\model\shop\User as UserModel;
+use app\shop\model\auth\Group as GroupModel;
 
 /**
  * 角色模型
@@ -19,15 +20,50 @@ class User extends UserModel
     }
 
     /**
+     * 用户分组列表
+     */
+    public function getListTree()
+    {
+        // 分组
+        $group = (new GroupModel)->order('id asc,sort desc')->select();
+        $group = !empty($group) ? $group->toArray() : [];
+        $group[] = [
+            'id' => 0,
+            'text' => '未分组'
+        ];
+        $group = array_combine(array_column($group, 'id'), $group);
+        // 用户
+        $user = $this->field('shop_user_id AS id,real_name AS lable,gid')->select();
+        $user = !empty($user) ? $user->toArray() : [];
+        // 分组
+        foreach ($user as $vo) {
+            $gid = $vo['gid'];
+            if (isset($group[$gid])) {
+                unset($vo['gid']);
+                $group[$gid]['children'][] = $vo;
+            }
+        }
+        foreach ($group as &$vo) {
+            $vo['lable'] = $vo['text'];
+            unset($vo['id']);
+            unset($vo['text']);
+            unset($vo['create_time']);
+        }
+        $group[] = $group[0];
+        unset($group[0]);
+        return array_values($group);
+    }
+
+    /**
      * 获取所有角色列表
      */
-    public function getList1()
+    /*public function getList1()
     {
         $all = $this->getAll();
         return $this->formatTreeData($all);
-    }
+    }*/
 
-    public function getMenu()
+    /*public function getMenu()
     {
         $res = $this->where(['parent_id' => 0])->select();
         $role_id = array_column($res->toArray(), 'role_id');
@@ -35,7 +71,7 @@ class User extends UserModel
         $where['parent_id'] = $role_id;
         $arr = $this->where($where)->select();
         return array_merge($role_id, array_column($arr->toArray(), 'role_id'));
-    }
+    }*/
 
     public function getInfo($where)
     {
@@ -46,7 +82,7 @@ class User extends UserModel
     /**
      * 获取所有上级id集
      */
-    public function getTopRoleIds($role_id, &$all = null)
+    /*public function getTopRoleIds($role_id, &$all = null)
     {
         static $ids = [];
         is_null($all) && $all = $this->getAll();
@@ -57,16 +93,16 @@ class User extends UserModel
             }
         }
         return $ids;
-    }
+    }*/
 
     /**
      * 获取所有角色
      */
-    private function getAll()
+    /*private function getAll()
     {
         $data = $this->order(['sort' => 'asc', 'create_time' => 'asc'])->select();
         return $data ? $data->toArray() : [];
-    }
+    }*/
 
     /**
      * 获取权限列表
@@ -90,20 +126,18 @@ class User extends UserModel
     /**
      * 角色名称 html格式前缀
      */
-    private function htmlPrefix($deep)
+    /*private function htmlPrefix($deep)
     {
         // 根据角色深度处理名称前缀
         $prefix = '';
         if ($deep > 1) {
             for ($i = 1; $i <= $deep - 1; $i++) {
-                //                $prefix .= '&nbsp;&nbsp;&nbsp;├ ';
                 $prefix .= '   ├ ';
             }
-            //            $prefix .= '&nbsp;';
             $prefix .= ' ';
         }
         return $prefix;
-    }
+    }*/
 
     public function addUser($data, $force = false)
     {
@@ -131,6 +165,7 @@ class User extends UserModel
                 'user_name' => trim($data['user_name']),
                 'password' => salt_hash($data['password']),
                 'real_name' => trim($data['real_name']),
+                'gid' => $data['gid'],
                 'role' => $data['role'],
                 'is_super' => $data['is_super'],
                 'app_id' => self::$app_id,
@@ -146,13 +181,13 @@ class User extends UserModel
         }
     }
 
-    public function getUserName($where, $shop_user_id = 0)
+    /*public function getUserName($where, $shop_user_id = 0)
     {
         if ($shop_user_id > 0) {
             return $this->where($where)->where('shop_user_id', '<>', $shop_user_id)->count();
         }
         return $this->where($where)->count();
-    }
+    }*/
 
     public function editUser($data)
     {
@@ -175,6 +210,7 @@ class User extends UserModel
                 'user_name' => $data['user_name'],
                 'password' => salt_hash($data['password']),
                 'real_name' => $data['real_name'],
+                'gid' => $data['gid'],
                 'role' => $data['role'],
                 'is_super' => $data['is_super'],
                 'app_id' => self::$app_id,
@@ -194,10 +230,10 @@ class User extends UserModel
         }
     }
 
-    public function getChild($where)
+    /*public function getChild($where)
     {
         return $this->where($where)->count();
-    }
+    }*/
 
     public function del($where)
     {

@@ -1,9 +1,4 @@
 <template>
-  <!--
-          作者：luoyiming
-          时间：2019-10-25
-          描述：用户列表
-      -->
   <div class="user">
     <!--搜索表单-->
     <div class="common-seach-wrap">
@@ -40,7 +35,7 @@
     <!--内容-->
     <div class="product-content">
       <div class="table-wrap">
-        <el-table :data="tableData" border style="width: 100%" v-loading="loading">
+        <el-table :data="tableData" style="width: 100%" v-loading="loading">
           <el-table-column prop="user_id" label="ID" width="80"></el-table-column>
           <el-table-column prop="user.nickName" label="昵称">
             <template slot-scope="scope">
@@ -190,4 +185,3 @@
     }
   };
 </script>
-<style></style>

@@ -30,7 +30,6 @@ class Collect extends Controller
                 'category_id' => $cid,
                 'page' => $page,
                 'field' => 'id,name,image_id',
-                'status' => 1,
             ]);
             return $this->renderSuccess('', compact('category', 'list'));
         }

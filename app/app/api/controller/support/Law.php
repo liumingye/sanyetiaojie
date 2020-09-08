@@ -37,7 +37,10 @@ class Law extends Controller
     public function info()
     {
         $id = input('id', 0, 'intval');
-        $data = (new LawModel)->getInfo($id);
+        $data = (new LawModel)->getInfo([
+            'id' => $id,
+            'status' => 1
+        ]);
 
         $withCat = input('cat', 0, 'intval');
         if ($data) {
@@ -48,8 +51,6 @@ class Law extends Controller
                 ];
                 $category2 = (array) CategoryModel::getCacheTreeSimple();
                 $res['category'] = array_merge($category1, $category2);
-                // $category = array_merge($category1, $category2);
-                // $res['category'] = array_combine(array_column($category, 'cid'), $category);
             }
             $res['data'] = $data;
             return $this->renderSuccess('', $res);

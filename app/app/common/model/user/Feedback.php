@@ -3,6 +3,7 @@
 namespace app\common\model\user;
 
 use app\common\model\BaseModel;
+use app\common\model\user\FeedbackImage as FeedbackImageModel;
 
 class Feedback extends BaseModel
 {
@@ -18,6 +19,14 @@ class Feedback extends BaseModel
     {
         return $this->belongsTo("app\\common\\model\\user\\User", 'uid', 'user_id');
     }
+    
+    /**
+     * 关联图片表
+     */
+    public function image()
+    {
+        return $this->hasMany('app\\common\\model\\user\\FeedbackImage', 'fid', 'id')->order(['id' => 'asc']);
+    }
 
     /**
      * 添加
@@ -32,6 +41,19 @@ class Feedback extends BaseModel
         $this->startTrans();
         try {
             $this->save($data);
+            if ($data['iFile'] != '') {
+                $arr = explode(',', $data['iFile']);
+                // 生成图片数据
+                $data = [];
+                foreach ($arr as $vo) {
+                    $data[] = [
+                        'mid' => $this->id,
+                        'image_id' => $vo,
+                        'app_id' => self::$app_id,
+                    ];
+                }
+                !empty($data) && (new FeedbackImageModel)->saveAll($data);
+            }
             $this->commit();
             return true;
         } catch (\Exception $e) {

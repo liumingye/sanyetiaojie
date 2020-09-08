@@ -46,7 +46,7 @@ let AuthApi = {
   userAdd(data, errorback) {
     return request._post('auth.user/add', data, errorback);
   },
- /*修改管理员需要的数据*/
+  /*修改管理员需要的数据*/
   userEditInfo(data, errorback) {
     return request._get('auth.user/edit', data, errorback);
   },
@@ -61,6 +61,22 @@ let AuthApi = {
   /*登录日志*/
   loginlog(data, errorback) {
     return request._post('auth.loginlog/index', data, errorback);
+  },
+  loginlogEmpty(data, errorback) {
+    return request._post('auth.loginlog/empty', data, errorback);
+  },
+  /*获取用户组*/
+  userGroup(data, errorback) {
+    return request._post('auth.group/index', data, errorback);
+  },
+  groupAdd(data, errorback) {
+    return request._post('auth.group/add', data, errorback);
+  },
+  groupEdit(data, errorback) {
+    return request._post('auth.group/edit', data, errorback);
+  },
+  groupDelete(data, errorback) {
+    return request._post('auth.group/delete', data, errorback);
   },
   /*操作日志*/
   optlog(data, errorback) {

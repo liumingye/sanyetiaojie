@@ -21,6 +21,9 @@ class SettingEnum extends Enum
     // 短信通知
     const SMS = 'sms';
 
+    // 小程序
+    const XCX = 'xcx';
+
     /**
      * 获取订单类型值
      */
@@ -41,6 +44,10 @@ class SettingEnum extends Enum
             ],
             self::SMS => [
                 'value' => self::SMS,
+                'describe' => '短信通知',
+            ],
+            self::XCX => [
+                'value' => self::XCX,
                 'describe' => '短信通知',
             ],
         ];

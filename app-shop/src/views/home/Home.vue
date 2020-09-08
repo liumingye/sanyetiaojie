@@ -1,5 +1,5 @@
 <template>
-  <div class="home">
+  <div class="home" v-loading="loading">
     <div class="operation-wrap">
       <el-row>
         <el-col :span="6">
@@ -50,7 +50,7 @@
     </div>
 
     <!--待办事项-->
-    <div class="matters-wrap">
+    <!-- <div class="matters-wrap">
       <div class="common-form mt16">
         待办事项<span class="ml10 f14 gray" style="font-weight: normal;">请尽快处理</span>
       </div>
@@ -77,7 +77,7 @@
           </div>
         </el-col>
       </el-row>
-    </div>
+    </div> -->
 
     <div class="home-index">
       <!--main-index-->
@@ -87,7 +87,7 @@
         </div>
 
         <el-row class="border-b">
-          <el-col :span="6">
+          <!-- <el-col :span="6">
             <div class="grid-content">
               <div class="pic">
                 <Icon :iconname="'#icon-xiaoshou'"></Icon>
@@ -110,7 +110,7 @@
                 <p class="yesterday">昨日：{{order_total.ytd}}</p>
               </div>
             </div>
-          </el-col>
+          </el-col> -->
           <el-col :span="6">
             <div class="grid-content">
               <div class="pic">
@@ -123,7 +123,7 @@
               </div>
             </div>
           </el-col>
-          <el-col :span="6">
+          <!-- <el-col :span="6">
             <div class="grid-content">
               <div class="pic">
                 <Icon :iconname="'#icon-piliangxiadan'"></Icon>
@@ -134,7 +134,7 @@
                 <p class="yesterday">昨日：{{order_user_total.ytd}}</p>
               </div>
             </div>
-          </el-col>
+          </el-col> -->
         </el-row>
 
       </div>
@@ -167,6 +167,7 @@
           order: [],
           stock: [],
         },
+        version: ''
       };
     },
     created() {

@@ -35,7 +35,7 @@ class Controller extends SyController
     public function initialize()
     {
         // 商家登录信息
-        $this->store = session('jjjshop_store');
+        $this->store = session('sy_store');
         // 当前路由信息
         $this->getRouteinfo();
         //  验证登录状态

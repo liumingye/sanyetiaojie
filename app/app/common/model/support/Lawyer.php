@@ -17,36 +17,42 @@ class Lawyer extends BaseModel
         $model = $this;
         // 默认搜索条件
         $params = array_merge([
-            'category_id' => '0',
+            'user_id' => 0,
+            'category_id' => 0,
             'list_rows' => 10,
             'field' => '*',
-            'user_id' => '0',
         ], $param);
         // 筛选条件
-        $filter = [];
         if ($params['category_id'] > 0) {
             $model = $model->where('category_id', $params['category_id']);
         }
+        $with = [];
         $withCollect = [
             'hasCollect' => function ($query) use ($params) {
                 $query->where('uid', $params['user_id']);
             },
         ];
+        $with = array_merge($with, $withCollect);
         $withImage = [
             'image' => function ($query) {
                 $query->field(['file_id,file_url,file_name,storage,save_name'])->hidden(['file_id', 'file_url', 'file_name', 'storage', 'save_name']);
             },
         ];
+        $with = array_merge($with, $withImage);
+        //子查询先过滤条件
+        $subsql = (new LawyerCollectModel)->where('uid', $params['user_id'])
+            ->where('app_id', self::$app_id)
+            ->buildSql();
+        // 开始查询
         $list = $model
+            ->alias('l')
             ->field($params['field'])
-            ->withJoin($withCollect)
-            ->with($withImage)
-            ->where($filter)
+            ->join([$subsql => 'c'], 'l.id=c.lid')
+            ->with($with)
             ->order('id desc')
             ->paginate($params, false, [
                 'query' => \request()->request(),
             ]);
-
         // 整理列表数据并返回
         return $this->setListData($list);
     }
@@ -56,13 +62,12 @@ class Lawyer extends BaseModel
         $model = $this;
         // 默认搜索条件
         $params = array_merge([
-            'category_id' => '0',
+            'category_id' => 0,
             'text' => '',
             'list_rows' => 10,
             'field' => '*',
-            'user_id' => '0'
+            'user_id' => 0
         ], $param);
-
         // 筛选条件
         $filter = [];
         if ($params['category_id'] > 0) {
@@ -70,8 +75,7 @@ class Lawyer extends BaseModel
         }
         if ($params['text'] != '') {
             $params['text'] = "%{$params['text']}%";
-            $model = $model
-                ->where('name', 'like', $params['text']);
+            $model = $model->where('name', 'like', $params['text']);
         }
         $with = [];
         if ($params['user_id'] > 0) {
@@ -82,14 +86,13 @@ class Lawyer extends BaseModel
             ];
             $with = array_merge($with, $withCollect);
         }
-
         $withImage = [
             'image' => function ($query) {
                 $query->field(['file_id,file_url,file_name,storage,save_name'])->hidden(['file_id', 'file_url', 'file_name', 'storage', 'save_name']);
             },
         ];
         $with = array_merge($with, $withImage);
-
+        // 开始查询
         $list = $model
             ->field($params['field'])
             ->with($with)
@@ -98,23 +101,21 @@ class Lawyer extends BaseModel
             ->paginate($params, false, [
                 'query' => \request()->request(),
             ]);
-
         // 整理列表数据并返回
         return $this->setListData($list);
     }
 
     public function setListData($data)
     {
-        $dataSource = $data;
-        // 整理商品列表数据
-        foreach ($dataSource as &$vo) {
-            $collect = $vo['hasCollect'];
-            unset($vo['hasCollect']);
-            if ($collect != null) {
+        $tmp = $data->toArray();
+        // 整理列表数据
+        foreach ($data as $key => &$vo) {
+            if (isset($tmp['data'][$key]['hasCollect'])) {
                 $vo['collect'] = true;
             } else {
                 $vo['collect'] = false;
             }
+            unset($vo['hasCollect']);
         }
         return $data;
     }
@@ -163,11 +164,6 @@ class Lawyer extends BaseModel
         } else {
             return (new LawyerCollectModel)->where(['uid' => $user_id, 'lid' => $id])->delete();
         }
-    }
-
-    public function shopUser()
-    {
-        return $this->hasOne('app\\common\\model\\shop\\User', 'shop_user_id', 'admin_id');
     }
 
     public static function detail($id)

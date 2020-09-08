@@ -2,18 +2,10 @@ import router, {
   resetRouter
 } from './router'
 import store from './store/'
-import {
-  Message,
-  Loading
-} from 'element-ui'
 import NProgress from 'nprogress' // progress bar
 import 'nprogress/nprogress.css' // progress bar style
 import {
-  getCookie,
-  setCookie,
-  delCookie,
-  setSessionStorage,
-  getSessionStorage
+  getCookie
 } from '@/utils/base'
 
 NProgress.configure({
@@ -25,16 +17,16 @@ const whiteList = ['/login', '/test', '/fonticon'];
 router.beforeEach(async (to, from, next) => {
   const isLogin = getCookie('isLogin');
   if (to.meta.title) {
-    let title='';
-    let shop_name=getCookie('shop_name');
-    if(shop_name&&typeof(shop_name)!='undefined'){
-      document.title = to.meta.title + '-'+shop_name;
-    }else{
+    let title = '';
+    let shop_name = getCookie('shop_name');
+    if (shop_name && typeof (shop_name) != 'undefined') {
+      document.title = to.meta.title + '-' + shop_name;
+    } else {
       document.title = to.meta.title + '-三叶调解管理系统';
     }
 
   }
-   //判断是否登录
+  //判断是否登录
   if (isLogin) {
     NProgress.start();
     let hasRoles = store.state.user.roles && store.state.user.roles.length > 0;
@@ -48,7 +40,8 @@ router.beforeEach(async (to, from, next) => {
         const accessRoutes = await store.dispatch('user/generateRoutes', roles);
         resetRouter();
         router.addRoutes(accessRoutes);
-        next({ ...to,
+        next({
+          ...to,
           replace: true
         });
       } catch (error) {

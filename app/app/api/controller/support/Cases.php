@@ -56,7 +56,10 @@ class Cases extends Controller
     public function info()
     {
         $id = input('id', 0, 'intval');
-        $data = (new CasesModel)->getInfo($id);
+        $data = (new CasesModel)->getInfo([
+            'id' => $id,
+            'status' => 1
+        ]);
 
         $withCat = input('cat', 0, 'intval');
         if ($data) {

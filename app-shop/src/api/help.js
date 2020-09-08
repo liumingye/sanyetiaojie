@@ -1,32 +1,36 @@
 import request from '@/utils/request'
 let HelpApi = {
-    getlist(data, errorback) {
-        return request._post('support.help/lists', data, errorback);
-    },
-    // orderdetail(data, errorback) {
-    //     return request._post('order.mediate/detail', data, errorback);
-    // },
-    // orderrefund(data, errorback) {
-    //     return request._post('order.refund/index', data, errorback);
-    // },
-    // delivery(data, errorback) {
-    //     return request._post('order.mediate/delivery', data, errorback);
-    // },
-    // confirm(data, errorback) {
-    //     return request._post('order.Operate/confirmCancel', data, errorback);
-    // },
-    // refundDetail(data, errorback) {
-    //     return request._get('order.refund/detail', data, errorback);
-    // },
-    // Approval(data, errorback) {
-    //     return request._get('order.refund/audit', data, errorback);
-    // },
-    // receipt(data, errorback) {
-    //     return request._post('order.refund/receipt', data, errorback);
-    // },
-    // updatePrice(data, errorback) {
-    //     return request._post('order.mediate/updatePrice', data, errorback);
-    // },
+  /*援助列表*/
+  getlist(data, errorback) {
+    return request._post('support.help/lists', data, errorback);
+  },
+  getNotice(data, errorback) {
+    return request._post('support.help/getnotice', data, errorback);
+  },
+  /*援助详情*/
+  helpdetail(data, errorback) {
+    return request._post('support.help/detail', data, errorback);
+  },
+  /*设置人员*/
+  setRole(data, errorback) {
+    return request._post('support.help/setrole', data, errorback);
+  },
+  /*获取人员列表*/
+  userList(data, errorback) {
+    return request._post('auth.user/index', data, errorback);
+  },
+  /*设置步骤*/
+  setWay(data, errorback) {
+    return request._post('support.help/setway', data, errorback);
+  },
+  /*调解完成*/
+  setComplete(data, errorback) {
+    return request._post('support.help/setcomplete', data, errorback);
+  },
+  /*编辑详情*/
+  editInfo(data, errorback) {
+    return request._post('support.help/editInfo', data, errorback);
+  },
 }
 
 export default HelpApi;

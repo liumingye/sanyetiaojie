@@ -3,6 +3,7 @@
 namespace app\common\model\shop;
 
 use app\common\model\BaseModel;
+
 /**
  * 商家用户权限模型
  */
@@ -18,14 +19,7 @@ class Access extends BaseModel
      */
     protected static function getAll()
     {
-        $data = static::withoutGlobalScope()->where(['is_show' => 1])->order(['sort' => 'asc', 'create_time' => 'asc'])->select();
+        $data = static::withoutGlobalScope()->where(['is_show' => 1])->hidden(['url', 'create_time', 'update_time', 'is_show'])->order(['sort' => 'asc', 'create_time' => 'asc'])->select();
         return $data ? $data->toArray() : [];
     }
-
-    protected static function UserRole()
-    {
-        $data = static::withoutGlobalScope()->where(['is_show' => 1])->order(['sort' => 'asc', 'create_time' => 'asc'])->select();
-        return $data ? $data->toArray() : [];
-    }
-
 }

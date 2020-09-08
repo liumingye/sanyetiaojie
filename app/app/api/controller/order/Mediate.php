@@ -14,9 +14,10 @@ class Mediate extends Controller
             $data = (new MediateModel())->getListByPhone($phone);
             return $this->renderSuccess('', compact('data'));
         } else {
+            $status = input('status', 0, 'intval');
             $user = $this->getUser(false);
             if ($user['user_id']) {
-                $data = (new MediateModel())->getList($user['user_id']);
+                $data = (new MediateModel())->getList($user['user_id'], $status);
                 return $this->renderSuccess('', compact('data'));
             }
         }

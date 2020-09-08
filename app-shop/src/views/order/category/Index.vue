@@ -1,23 +1,21 @@
 <template>
-  <div class="product">
+  <div>
     <!--添加分类-->
     <div class="common-level-rail">
-      <el-button size="small" type="primary" icon="el-icon-plus" @click="addClick" v-auth="'/product/category/add'">添加分类</el-button>
-      <!-- <el-button size="small" @click="gotoPageCategory" v-auth="'/product/category/add'">设置分类模板</el-button> -->
+      <el-button size="small" type="primary" icon="el-icon-plus" @click="addClick" v-auth="'/order/category/add'">添加分类</el-button>
     </div>
-
     <!--内容-->
-    <div class="product-content">
+    <div>
       <div class="table-wrap">
-        <el-table size="mini" :data="tableData" row-key="category_id" border default-expand-all :tree-props="{ children: 'child' }" style="width: 100%">
+        <el-table size="mini" :data="tableData" row-key="category_id" default-expand-all :tree-props="{ children: 'child' }" style="width: 100%">
           <el-table-column prop="category_id" label="ID" width="100"></el-table-column>
           <el-table-column prop="name" label="分类名称" width="300"></el-table-column>
           <el-table-column prop="sort" label="分类排序"></el-table-column>
           <el-table-column prop="create_time" label="添加时间"></el-table-column>
-          <el-table-column fixed="right" label="操作" width="100">
+          <el-table-column fixed="right" align="right" width="150px">
             <template slot-scope="scope">
-              <el-button @click="editClick(scope.row)" type="text" size="small" v-auth="'/product/category/edit'">编辑</el-button>
-              <el-button @click="deleteClick(scope.row)" type="text" size="small" v-auth="'/product/category/delete'">删除</el-button>
+              <el-button @click="editClick(scope.row)" size="mini" v-auth="'/order/category/edit'">编辑</el-button>
+              <el-button @click="deleteClick(scope.row)" size="mini" type="danger" v-auth="'/order/category/delete'">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -33,8 +31,8 @@
 
 <script>
   import PorductApi from '@/api/product.js';
-  import Add from './Add.vue';
-  import Edit from './Edit.vue';
+  import Add from './add.vue';
+  import Edit from './edit.vue';
   export default {
     components: {
       Add,
@@ -142,11 +140,3 @@
   };
 
 </script>
-
-<style scoped>
-  .category-photo {
-    width: 20px;
-    height: 20px;
-  }
-
-</style>

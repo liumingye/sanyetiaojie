@@ -4,19 +4,19 @@ let LawApi = {
 
     /*分类管理*/
     catList(data, errorback) {
-        return request._post('support.lawcat/index', data, errorback);
+        return request._post('support.lawCat/index', data, errorback);
     },
     /*分类添加*/
     catAdd(data, errorback) {
-        return request._post('support.lawcat/add', data, errorback);
+        return request._post('support.lawCat/add', data, errorback);
     },
     /*分类删除*/
     catDel(data, errorback) {
-        return request._post('support.lawcat/delete', data, errorback);
+        return request._post('support.lawCat/delete', data, errorback);
     },
     /*分类修改*/
     catEdit(data, errorback) {
-        return request._post('support.lawcat/edit', data, errorback);
+        return request._post('support.lawCat/edit', data, errorback);
     },
     /*法律法规列表*/
     supportLists(data, errorback) {

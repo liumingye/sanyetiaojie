@@ -11,14 +11,16 @@
     <!--内容-->
     <div class="content">
       <div class="table-wrap">
-        <el-table :data="tableData" size="small" border style="width: 100%" v-loading="loading">
+        <el-table :data="tableData" size="small" style="width: 100%" v-loading="loading">
           <el-table-column prop="id" label="ID" width="100"></el-table-column>
           <el-table-column prop="title" label="标题"></el-table-column>
-          <el-table-column prop="create_time" label="添加时间" width="140"></el-table-column>
-          <el-table-column fixed="right" label="操作" width="100">
+          <el-table-column prop="author" label="作者"></el-table-column>
+          <el-table-column prop="source" label="来源"></el-table-column>
+          <el-table-column prop="create_time" label="添加时间"></el-table-column>
+          <el-table-column fixed="right" align="right" width="150px">
             <template slot-scope="scope">
-              <el-button @click="editClick(scope.row)" type="text" size="small" v-auth="'/support/news/edit'">编辑</el-button>
-              <el-button @click="deleteClick(scope.row)" type="text" size="small" v-auth="'/support/news/delete'">删除</el-button>
+              <el-button @click="editClick(scope.row)" size="mini" v-auth="'/support/news/edit'">编辑</el-button>
+              <el-button @click="deleteClick(scope.row)" size="mini" type="danger" v-auth="'/support/news/delete'">删除</el-button>
             </template>
           </el-table-column>
         </el-table>

@@ -19,7 +19,7 @@
           <el-row>
             <el-button icon="el-icon-upload" @click="openUpload">选择图片</el-button>
             <div v-if="form.image_id != ''" class="img mt10">
-              <img :src="file_path" width="100" />
+              <img v-img-url="file_path" width="100" />
             </div>
           </el-row>
         </el-form-item>
@@ -37,14 +37,6 @@
         </el-form-item>
         <el-form-item label="擅长领域：" prop="model.realm">
           <el-input type="textarea" :autosize="{ minRows: 4}" v-model="form.model.realm" class="max-w460"></el-input>
-        </el-form-item>
-        <el-form-item label="律师账号：" v-if="form.model.shopUser">
-          <el-input v-model="form.model.shopUser.user_name" class="max-w460" disabled></el-input>
-          <div class="gray9">如需修改请到管理员列表修改</div>
-        </el-form-item>
-        <el-form-item label="律师密码：" v-if="form.model.shopUser">
-          <el-input class="max-w460" disabled></el-input>
-          <div class="gray9">如需修改请到管理员列表修改</div>
         </el-form-item>
       </div>
       <!--提交-->
@@ -69,8 +61,6 @@
       return {
         /*是否上传图片*/
         isupload: false,
-        /*切换菜单*/
-        activeIndex: '1',
         loading: false,
         /*form表单数据*/
         form: {

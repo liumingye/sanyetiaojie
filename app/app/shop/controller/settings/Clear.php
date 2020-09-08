@@ -38,8 +38,8 @@ class Clear extends Controller
         return [
             'category' => [
                 'type' => 'cache',
-                'key' => 'lawyer_' . $app_id,
-                'name' => '律师分类'
+                'key' => 'category_' . $app_id,
+                'name' => '分类缓存'
             ],
             'setting' => [
                 'type' => 'cache',
@@ -62,7 +62,6 @@ class Clear extends Controller
         ];
     }
 
-
     /**
      * 删除缓存
      */
@@ -75,8 +74,14 @@ class Clear extends Controller
             $item = $cacheList[$key];
             if ($item['type'] === 'cache') {
                 Cache::has($item['key']) && Cache::delete($item['key']);
+                //如果是category，则多删除
+                if (strstr($item['key'], 'category_')) {
+                    Cache::has('casescat_' . $app_id) && Cache::delete('casescat_' . $app_id);
+                    Cache::has('lawcat_' . $app_id) && Cache::delete('lawcat_' . $app_id);
+                    Cache::has('lawyercat_' . $app_id) && Cache::delete('lawyercat_' . $app_id);
+                }
                 //如果是app，则多删除
-                if($item['key'] == 'app'){
+                if (strstr($item['key'], 'app_')) {
                     Cache::has('app_wx_' . $app_id) && Cache::delete('app_wx_' . $app_id);
                 }
             } elseif ($item['type'] === 'file') {
@@ -124,6 +129,4 @@ class Clear extends Controller
         }
         return true;
     }
-
-
 }

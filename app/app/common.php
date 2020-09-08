@@ -4,35 +4,6 @@ use think\facade\Log;
 use think\facade\Request;
 
 // 应用公共文件
-/**
- * 打印调试函数
- * @param $content
- * @param $is_die
- */
-function pre($content, $is_die = true)
-{
-
-    header('Content-type: text/html; charset=utf-8');
-    echo '<pre>' . print_r($content, true);
-    $is_die && die();
-}
-
-/**
- * 隐藏敏感字符
- * @param $value
- * @return string
- */
-function substr_cut($value)
-{
-    $strlen = mb_strlen($value, 'utf-8');
-    if ($strlen <= 1) {
-        return $value;
-    }
-
-    $firstStr = mb_substr($value, 0, 1, 'utf-8');
-    $lastStr = mb_substr($value, -1, 1, 'utf-8');
-    return $strlen == 2 ? $firstStr . str_repeat('*', $strlen - 1) : $firstStr . str_repeat("*", $strlen - 2) . $lastStr;
-}
 
 /**
  * 获取当前系统版本号
@@ -74,7 +45,7 @@ function toUnderScore($str)
  */
 function salt_hash($password)
 {
-    return md5(md5($password) . 'jjjshop_salt_2020');
+    return md5(md5($password) . 'liumingye_salt_2020');
 }
 
 /**
@@ -199,68 +170,9 @@ function base_url()
     static $baseUrl = '';
     if (empty($baseUrl)) {
         $request = Request::instance();
-        //$subDir = str_replace('\\', '/', dirname($request->server('PHP_SELF')));
         $baseUrl = $request->scheme() . '://' . $request->host() . '/';
     }
     return $baseUrl;
-}
-
-/**
- * 左侧填充0
- * @param $value
- * @param int $padLength
- * @return string
- */
-function pad_left($value, $padLength = 2)
-{
-    return \str_pad($value, $padLength, "0", STR_PAD_LEFT);
-}
-
-/**
- * 过滤emoji表情
- * @param $text
- * @return null|string|string[]
- */
-function filter_emoji($text)
-{
-    // 此处的preg_replace用于过滤emoji表情
-    // 如需支持emoji表情, 需将mysql的编码改为utf8mb4
-    return preg_replace('/[\xf0-\xf7].{3}/', '', $text);
-}
-
-/**
- * 获取全局唯一标识符
- * @param bool $trim
- * @return string
- */
-function getGuidV4($trim = true)
-{
-    // Windows
-    if (function_exists('com_create_guid') === true) {
-        $charid = com_create_guid();
-        return $trim == true ? trim($charid, '{}') : $charid;
-    }
-    // OSX/Linux
-    if (function_exists('openssl_random_pseudo_bytes') === true) {
-        $data = openssl_random_pseudo_bytes(16);
-        $data[6] = chr(ord($data[6]) & 0x0f | 0x40); // set version to 0100
-        $data[8] = chr(ord($data[8]) & 0x3f | 0x80); // set bits 6-7 to 10
-        return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
-    }
-    // Fallback (PHP 4.2+)
-    mt_srand((double) microtime() * 10000);
-    $charid = strtolower(md5(uniqid(rand(), true)));
-    $hyphen = chr(45); // "-"
-    $lbrace = $trim ? "" : chr(123); // "{"
-    $rbrace = $trim ? "" : chr(125); // "}"
-    $guidv4 = $lbrace .
-    substr($charid, 0, 8) . $hyphen .
-    substr($charid, 8, 4) . $hyphen .
-    substr($charid, 12, 4) . $hyphen .
-    substr($charid, 16, 4) . $hyphen .
-    substr($charid, 20, 12) .
-        $rbrace;
-    return $guidv4;
 }
 
 function format_time($value)

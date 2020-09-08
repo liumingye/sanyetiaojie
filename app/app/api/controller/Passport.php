@@ -15,7 +15,7 @@ class Passport extends Controller
     public function login()
     {
         $model = new UserModel;
-        return $this->renderSuccess('',[
+        return $this->renderSuccess('', [
             'user_id' => $model->login($this->request->post()),
             'token' => $model->getToken()
         ]);
@@ -24,7 +24,6 @@ class Passport extends Controller
     public function getPhone()
     {
         $model = new UserModel;
-        return $this->renderSuccess('',$model->getPhone($this->request->post()));
+        return $this->renderSuccess('', $model->getPhone($this->request->post()));
     }
-
 }

@@ -1,58 +1,38 @@
 /*基础页面路由*/
 let baserouter = [
-    /*登录页面*/
-    {
-        path: '/login',
-        name: 'Login',
-        meta: {
-            title: '登录'
-        },
-        component: () =>
-            import('@/views/Login')
+  /*登录页面*/
+  {
+    path: '/login',
+    name: 'login',
+    meta: {
+      title: '登录'
     },
-    {
-        path: '/',
-        redirect: {
-            name: 'Home'
-        },
-        meta: {
-            title: '母版'
-        },
-        component: () =>
-            import('@/views/layout/Main'),
-        children: [
-            /*后台首页*/
-            {
-                path: '/home',
-                name: 'Home',
-                meta: {
-                    title: '首页'
-                },
-                component: () =>
-                    import('@/views/home/Home')
-            },
-        ]
+    component: () =>
+      import('@/views/login')
+  },
+  {
+    path: '/',
+    redirect: {
+      name: 'Home'
     },
-    /*测试页面*/
-    {
-        path: '/test',
-        name: 'Test',
-        meta: {
-            title: '测试'
-        },
-        component: () =>
-            import('@/views/help/Test')
+    meta: {
+      title: '母版'
     },
-    /*字体图标查找页面*/
-    {
-        path: '/fonticon',
-        name: 'Fonticon',
+    component: () =>
+      import('@/views/layout/main'),
+    children: [
+      /*后台首页*/
+      {
+        path: '/home',
+        name: 'Home',
         meta: {
-            title: '字体图标'
+          title: '首页'
         },
         component: () =>
-            import('@/views/help/Fonticon')
-    }
+          import('@/views/home/home')
+      },
+    ]
+  },
 ];
 
 /*错误页面路由*/

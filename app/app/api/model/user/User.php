@@ -2,11 +2,8 @@
 
 namespace app\api\model\user;
 
-use think\facade\Cache;
 use app\common\exception\BaseException;
 use app\common\model\user\User as UserModel;
-
-use app\api\model\plus\agent\Referee as RefereeModel;
 use app\common\library\easywechat\AppWx;
 
 /**
@@ -32,8 +29,7 @@ class User extends UserModel
      */
     public static function getUser($token)
     {
-        $userId = Cache::get($token);
-        return self::where(['user_id' => $userId])->find();
+        return self::where(['open_id' => $token])->find();
     }
 
     /**
@@ -47,12 +43,9 @@ class User extends UserModel
         // 自动注册用户
         $userInfo = json_decode(htmlspecialchars_decode($post['user_info']), true);
 
-        $user_id = $this->register($session['openid'], $userInfo, $session['session_key']);
-        // 生成token (session3rd)
-        $this->token = $this->token($session['openid']);
-        // 记录缓存, 7天
-        Cache::tag('cache')->set($this->token, $user_id, 86400 * 7);
-        return $user_id;
+        $model = $this->register($session['openid'], $userInfo, $session['session_key']);
+        $this->token = $session['openid'];
+        return $model['user_id'];
     }
 
     /**
@@ -60,21 +53,17 @@ class User extends UserModel
      */
     public function getPhone($post)
     {
-        // 微信登录 获取session_key
         $app = AppWx::getApp();
         $user = $this->getUser($post['token']);
         $decryptedData = $app->encryptor->decryptData($user['session_key'], $post['iv'], $post['encryptedData']);
         try {
             $this->startTrans();
-            $this->save([
-                'user_id' => $user['user_id'],
-                'mobile' => $decryptedData['data']['phoneNumber'],
-                'app_id' => self::$app_id
+            $this->where('user_id', $user['user_id'])->save([
+                'mobile' => $decryptedData['phoneNumber']
             ]);
             $this->commit();
         } catch (\Exception $e) {
         }
-
         return $decryptedData;
     }
 
@@ -84,22 +73,6 @@ class User extends UserModel
     public function getToken()
     {
         return $this->token;
-    }
-
-
-    /**
-     * 生成用户认证的token
-     */
-    private function token($openid)
-    {
-        $app_id = self::$app_id;
-        // 生成一个不会重复的随机字符串
-        $guid = \getGuidV4();
-        // 当前时间戳 (精确到毫秒)
-        $timeStamp = microtime(true);
-        // 自定义一个盐
-        $salt = 'token_salt';
-        return md5("{$app_id}_{$timeStamp}_{$openid}_{$guid}_{$salt}");
     }
 
     /**
@@ -129,6 +102,6 @@ class User extends UserModel
             $this->rollback();
             throw new BaseException(['msg' => $e->getMessage()]);
         }
-        return $model['user_id'];
+        return $model;
     }
 }

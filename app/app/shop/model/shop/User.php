@@ -2,11 +2,7 @@
 
 namespace app\shop\model\shop;
 
-use app\admin\model\Access as AccessModel;
 use app\common\model\shop\User as UserModel;
-use app\shop\model\auth\RoleAccess;
-use app\shop\model\auth\User as AuthUserModel;
-use app\shop\model\auth\UserRole;
 
 /**
  * 后台管理员登录模型

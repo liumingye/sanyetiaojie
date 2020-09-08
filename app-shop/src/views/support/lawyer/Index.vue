@@ -11,22 +11,22 @@
     <!--内容-->
     <div class="content">
       <div class="table-wrap">
-        <el-table :data="tableData" size="small" border style="width: 100%" v-loading="loading">
+        <el-table :data="tableData" size="small" style="width: 100%" v-loading="loading">
           <el-table-column prop="id" label="ID" width="100"></el-table-column>
           <el-table-column prop="name" label="姓名"></el-table-column>
           <el-table-column label="图片">
             <template slot-scope="scope" v-if="scope.row.image != null">
-              <img class="user-photo" :src="scope.row.image.file_path" />
+              <img class="user-photo" v-img-url="scope.row.image.file_path" />
             </template>
           </el-table-column>
           <el-table-column prop="phone" label="电话"></el-table-column>
           <el-table-column prop="location" label="位置"></el-table-column>
           <el-table-column prop="category_name" label="分类"></el-table-column>
-          <el-table-column prop="create_time" label="添加时间" width="140"></el-table-column>
-          <el-table-column fixed="right" label="操作" width="100">
+          <el-table-column prop="create_time" label="添加时间"></el-table-column>
+          <el-table-column fixed="right" align="right" width="150px">
             <template slot-scope="scope">
-              <el-button @click="editClick(scope.row)" type="text" size="small" v-auth="'/support/lawyer/edit'">编辑</el-button>
-              <el-button @click="deleteClick(scope.row)" type="text" size="small" v-auth="'/support/lawyer/delete'">删除</el-button>
+              <el-button @click="editClick(scope.row)" size="mini" v-auth="'/support/lawyer/edit'">编辑</el-button>
+              <el-button @click="deleteClick(scope.row)" size="mini" type="danger" v-auth="'/support/lawyer/delete'">删除</el-button>
             </template>
           </el-table-column>
         </el-table>

@@ -29,21 +29,7 @@ class Lawyer extends LawyerModel
      */
     public function remove()
     {
-        $adminId = $this->admin_id;
-        if ($adminId > 0) {
-            (new UserModel)->del(['shop_user_id' => $adminId]);
-        }
         return $this->delete();
-    }
-
-    private function genUserNumber()
-    {
-        $chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        $username = "";
-        for ($i = 0; $i < 6; $i++) {
-            $username .= $chars[mt_rand(0, strlen($chars))];
-        }
-        return strtoupper(base_convert(time() - 1420070400, 10, 36)) . $username;
     }
 
     /**
@@ -55,29 +41,6 @@ class Lawyer extends LawyerModel
         // 开启事务
         $this->startTrans();
         try {
-            if (isset($data['user_name'])) {
-                $data['user_name'] = trim($data['user_name']);
-                if ($data['user_name'] == '') {
-                    $data['user_name'] = $this->genUserNumber();
-                }
-            } else {
-                $data['user_name'] = $this->genUserNumber();
-            }
-            if (isset($data['password'])) {
-                $data['password'] = trim($data['password']);
-                if ($data['password'] == '') {
-                    $data['password'] = $this->genUserNumber();
-                }
-            } else {
-                $data['password'] = $this->genUserNumber();
-            }
-            $adminUser = (new UserModel)->addUser([
-                'user_name' => $data['user_name'],
-                'password' => $data['password'],
-                'real_name' => $data['user_name'],
-                'role' => 2
-            ], true);
-            $data['admin_id'] = $adminUser->shop_user_id;
             $this->save($data);
             $this->commit();
             return true;

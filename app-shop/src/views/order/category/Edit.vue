@@ -4,111 +4,110 @@
       <el-form-item label="分类名称" prop="name" :label-width="formLabelWidth">
         <el-input v-model="form.name" autocomplete="off"></el-input>
       </el-form-item>
-      <el-form-item label="分类排序" prop="sort" :label-width="formLabelWidth"><el-input v-model.number="form.sort" autocomplete="off"></el-input></el-form-item>
+      <el-form-item label="分类描述" prop="text" :label-width="formLabelWidth">
+        <el-input v-model.number="form.text" autocomplete="off"></el-input>
+      </el-form-item>
+      <el-form-item label="分类排序" prop="sort" :label-width="formLabelWidth">
+        <el-input v-model.number="form.sort" autocomplete="off"></el-input>
+      </el-form-item>
     </el-form>
 
     <div slot="footer" class="dialog-footer">
-      <el-button @click="dialogFormVisible">取 消</el-button>
+      <el-button @click="dialogFormVisible(0)">取 消</el-button>
       <el-button type="primary" @click="addUser" :loading="loading">确 定</el-button>
     </div>
   </el-dialog>
 </template>
 
 <script>
-import PorductApi from '@/api/product.js';
-export default {
-  components: {},
-  data() {
-    return {
-       /*表单数据对象*/
-      form: {
-        category_id: 0,
-        parent_id: 0,
-        name: '',
-        image_id: '',
-        sort: ''
-      },
-      file_path: '',
-      /*验证规则*/
-      formRules: {
-        name: [
-          {
+  import PorductApi from '@/api/product.js';
+  export default {
+    components: {},
+    data() {
+      return {
+        /*表单数据对象*/
+        form: {
+          category_id: 0,
+          parent_id: 0,
+          name: '',
+          image_id: '',
+          sort: '',
+          text: ''
+        },
+        file_path: '',
+        /*验证规则*/
+        formRules: {
+          name: [{
             required: true,
             message: '请输入分类名称',
             trigger: 'blur'
-          }
-        ],
-        image_id: [
-          {
+          }],
+          image_id: [{
             required: true,
             message: '请上传分类图片',
             trigger: 'blur'
-          }
-        ],
-        sort: [
-          {
-            required: true,
-            message: '分类排序不能为空'
-          },
-          {
-            type: 'number',
-            message: '分类排序必须为数字'
-          }
-        ]
-      },
-      /*左边长度*/
-      formLabelWidth: '120px',
-      /*是否显示*/
-      dialogVisible: false,
-       /*是否加载完成*/
-      loading: false,
-    };
-  },
-  props: ['open_edit', 'editform'],
-  created() {
-    this.dialogVisible = this.open_edit;
-    this.form.category_id = this.editform.model.category_id;
-    this.form.parent_id = this.editform.model.parent_id;
-    this.form.name = this.editform.model.name;
-    this.form.sort = this.editform.model.sort;
-  },
-  methods: {
-    /*修改用户*/
-    addUser() {
-      let self = this;
-      let params = self.form;
-      self.$refs.form.validate(valid => {
-        if (valid) {
-          self.loading = true;
-          PorductApi.catEdit(params, true)
-            .then(data => {
-              self.loading = false;
-              self.$message({
-                message: '修改成功',
-                type: 'success'
+          }],
+          sort: [{
+              required: true,
+              message: '分类排序不能为空'
+            },
+            {
+              type: 'number',
+              message: '分类排序必须为数字'
+            }
+          ]
+        },
+        /*左边长度*/
+        formLabelWidth: '120px',
+        /*是否显示*/
+        dialogVisible: false,
+        /*是否加载完成*/
+        loading: false,
+      };
+    },
+    props: ['open_edit', 'editform'],
+    created() {
+      this.dialogVisible = this.open_edit;
+      this.form = this.editform.model;
+    },
+    methods: {
+      /*修改用户*/
+      addUser() {
+        let self = this;
+        let params = self.form;
+        self.$refs.form.validate(valid => {
+          if (valid) {
+            self.loading = true;
+            PorductApi.catEdit(params, true)
+              .then(data => {
+                self.loading = false;
+                self.$message({
+                  message: '修改成功',
+                  type: 'success'
+                });
+                self.dialogFormVisible(true);
+              })
+              .catch(error => {
+                self.loading = false;
               });
-              self.dialogFormVisible(true);
-            })
-            .catch(error => {
-              self.loading = false;
-            });
+          }
+        });
+      },
+      /*关闭弹窗*/
+      dialogFormVisible(e) {
+        if (e) {
+          this.$emit('closeDialog', {
+            type: 'success',
+            openDialog: false
+          });
+        } else {
+          this.$emit('closeDialog', {
+            type: 'error',
+            openDialog: false
+          });
         }
-      });
-    },
-    /*关闭弹窗*/
-    dialogFormVisible(e) {
-      if (e) {
-        this.$emit('closeDialog', {
-          type: 'success',
-          openDialog: false
-        });
-      } else {
-        this.$emit('closeDialog', {
-          type: 'error',
-          openDialog: false
-        });
-      }
-    },
-  }
-};
+      },
+    }
+  };
+
 </script>

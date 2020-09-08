@@ -16,9 +16,6 @@ class Category extends CategoryModel
     public function add($data)
     {
         $data['app_id'] = self::$app_id;
-//        if (!empty($data['image'])) {
-//            $data['image_id'] = UploadFile::getFildIdByName($data['image']);
-//        }
         $this->deleteCache();
         return $this->save($data);
     }
@@ -43,11 +40,6 @@ class Category extends CategoryModel
      */
     public function remove($categoryId)
     {
-        // 判断是否存在商品
-        /*if ($productCount = (new Product)->getProductTotal(['category_id' => $categoryId])) {
-            $this->error = '该分类下存在' . $productCount . '个商品，不允许删除';
-            return false;
-        }*/
         // 判断是否存在子分类
         if (static::hasSubCategory($categoryId)) {
             $this->error = '该分类下存在子分类，请先删除';

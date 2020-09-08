@@ -8,15 +8,15 @@
     <!--内容-->
     <div class="content">
       <div class="table-wrap">
-        <el-table size="mini" :data="tableData" row-key="cid" border default-expand-all :tree-props="{ children: 'child' }" style="width: 100%" v-loading="loading">
+        <el-table size="mini" :data="tableData" row-key="cid" default-expand-all :tree-props="{ children: 'child' }" style="width: 100%" v-loading="loading">
           <el-table-column prop="cid" label="ID" width="100"></el-table-column>
           <el-table-column prop="name" label="分类名称" width="300"></el-table-column>
           <el-table-column prop="sort" label="分类排序"></el-table-column>
           <el-table-column prop="create_time" label="添加时间"></el-table-column>
-          <el-table-column fixed="right" label="操作" width="100">
+          <el-table-column fixed="right" align="right" width="150px">
             <template slot-scope="scope">
-              <el-button @click="editClick(scope.row)" type="text" size="small" v-auth="'/support/lawyercat/edit'">编辑</el-button>
-              <el-button @click="deleteClick(scope.row)" type="text" size="small" v-auth="'/support/lawyercat/delete'">删除</el-button>
+              <el-button @click="editClick(scope.row)" size="mini" v-auth="'/support/lawyercat/edit'">编辑</el-button>
+              <el-button @click="deleteClick(scope.row)" size="mini" type="danger" v-auth="'/support/lawyercat/delete'">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -32,8 +32,8 @@
 
 <script>
   import lawyerApi from '@/api/lawyer.js';
-  import Add from './Add.vue';
-  import Edit from './Edit.vue';
+  import Add from './add.vue';
+  import Edit from './edit.vue';
   export default {
     components: {
       Add,

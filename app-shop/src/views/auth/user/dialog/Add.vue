@@ -1,9 +1,14 @@
 <template>
-  <el-dialog title="添加管理员" :visible.sync="dialogVisible" @close="dialogFormVisible" :close-on-click-modal="false" :close-on-press-escape="false">
+  <el-dialog title="添加人员" :visible.sync="dialogVisible" @close="dialogFormVisible" :close-on-click-modal="false" :close-on-press-escape="false">
     <!--form表单-->
     <el-form size="small" ref="form" :model="form" :rules="formRules" :label-width="formLabelWidth">
       <el-form-item label="用户名" prop="user_name">
         <el-input v-model="form.user_name" placeholder="请输入用户名"></el-input>
+      </el-form-item>
+      <el-form-item label="所属分组" prop="gid">
+        <el-select v-model="form.gid">
+          <el-option v-for="item in groupList" :value="item.id" :key="item.id" :label="item.text"></el-option>
+        </el-select>
       </el-form-item>
       <el-form-item label="所属角色" prop="role">
         <el-select v-model="form.role">
@@ -28,113 +33,153 @@
 </template>
 
 <script>
-  import AuthApi from '@/api/auth.js';
-  export default {
-    data() {
-      return {
-        /*左边长度*/
-        formLabelWidth: '120px',
-        /*是否显示*/
-        loading: false,
-        /*是否显示*/
-        dialogVisible: false,
-        /*form表单对象*/
-        form: {
-          user_name: '',
-          access_id: []
-        },
-        /*form验证*/
-        formRules: {
-          user_name: [{
+import AuthApi from "@/api/auth.js";
+export default {
+  data() {
+    return {
+      /*左边长度*/
+      formLabelWidth: "120px",
+      /*是否显示*/
+      loading: false,
+      /*是否显示*/
+      dialogVisible: false,
+      /*form表单对象*/
+      form: {
+        user_name: "",
+        access_id: [],
+      },
+      /*form验证*/
+      formRules: {
+        user_name: [
+          {
             required: true,
-            message: ' ',
-            trigger: 'blur'
-          }],
-          role: [{
+            message: " ",
+            trigger: "blur",
+          },
+        ],
+        role: [
+          {
             required: true,
-            message: ' ',
-            trigger: 'blur'
-          }],
-          password: [{
+            message: " ",
+            trigger: "blur",
+          },
+        ],
+        password: [
+          {
             required: true,
-            message: ' ',
-            trigger: 'blur'
-          }],
-          confirm_password: [{
+            message: " ",
+            trigger: "blur",
+          },
+        ],
+        confirm_password: [
+          {
             required: true,
-            message: ' ',
-            trigger: 'blur'
-          }],
-          real_name: [{
+            message: " ",
+            trigger: "blur",
+          },
+        ],
+        real_name: [
+          {
             required: true,
-            message: ' ',
-            trigger: 'blur'
-          }]
-        },
-        roleList: [{
+            message: " ",
+            trigger: "blur",
+          },
+        ],
+      },
+      roleList: [
+        {
           role_id: 0,
-          role_name_h1: '超级管理员'
-        }, {
+          role_name_h1: "超级管理员",
+        },
+        {
           role_id: 1,
-          role_name_h1: '委员会'
-        }]
+          role_name_h1: "委员会",
+        },
+        {
+          role_id: 2,
+          role_name_h1: "律师",
+        },
+      ],
+      groupList: null,
+    };
+  },
+  props: ["open"],
+  watch: {
+    open: function (n, o) {
+      if (n != o) {
+        this.dialogVisible = this.open;
+        if (this.open) {
+          this.getBaseData();
+        }
+      }
+    },
+  },
+  created() {},
+  methods: {
+    /**
+     * 获取基础数据
+     */
+    getBaseData: function () {
+      let self = this;
+      self.loading = true;
+      AuthApi.userGroup({}, true)
+        .then((data) => {
+          self.loading = false;
+          self.groupList = [
+            {
+              id: 0,
+              text: "无分组",
+            },
+          ].concat(data.data.list.data);
+        })
+        .catch((error) => {
+          self.loading = false;
+        });
+    },
+    /*添加*/
+    onSubmit() {
+      let self = this;
+      self.$refs.form.validate((valid) => {
+        if (valid) {
+          self.loading = true;
+          let params = self.form;
+          AuthApi.userAdd(params, true)
+            .then((data) => {
+              self.loading = false;
+              self.$message({
+                message: "恭喜你，添加成功",
+                type: "success",
+              });
+              self.dialogFormVisible(true);
+            })
+            .catch((error) => {
+              self.loading = false;
+            });
+        }
+      });
+    },
+
+    /*关闭弹窗*/
+    dialogFormVisible(e) {
+      if (e) {
+        this.$emit("close", {
+          type: "success",
+          self: this,
+          openDialog: false,
+        });
+      } else {
+        this.$emit("close", {
+          type: "error",
+          openDialog: false,
+        });
+      }
+      this.form = {
+        user_name: "",
+        access_id: [],
       };
     },
-    props: ['open'],
-    watch: {
-      open: function (n, o) {
-        if (n != o) {
-          this.dialogVisible = this.open;
-        }
-      }
-    },
-    created() {},
-    methods: {
-      /*添加*/
-      onSubmit() {
-        let self = this;
-        self.$refs.form.validate((valid) => {
-          if (valid) {
-            self.loading = true;
-            let params = self.form;
-            AuthApi.userAdd(params, true)
-              .then(data => {
-                self.loading = false;
-                self.$message({
-                  message: '恭喜你，添加成功',
-                  type: 'success'
-                });
-                self.dialogFormVisible(true);
-              })
-              .catch(error => {
-                self.loading = false;
-              });
-          }
-        })
-      },
-
-      /*关闭弹窗*/
-      dialogFormVisible(e) {
-        if (e) {
-          this.$emit('close', {
-            type: 'success',
-            self: this,
-            openDialog: false
-          });
-        } else {
-          this.$emit('close', {
-            type: 'error',
-            openDialog: false
-          });
-        }
-        this.form = {
-          user_name: '',
-          access_id: []
-        }
-      }
-    }
-  };
-
+  },
+};
 </script>
 
 <style></style>

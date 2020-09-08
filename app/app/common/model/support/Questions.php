@@ -20,7 +20,12 @@ class Questions extends BaseModel
             'list_rows' => 15,
             'field' => '*'
         ], $param);
-
+        // 筛选条件
+        if ($params['text'] != '') {
+            $params['text'] = "%{$params['text']}%";
+            $model = $model
+                ->where('title', 'like', $params['text']);
+        }
         $list = $model
             ->field($params['field'])
             ->order('id desc')

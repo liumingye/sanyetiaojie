@@ -1,11 +1,16 @@
 <template>
-  <el-dialog title="修改管理员" :visible.sync="dialogVisible" @close="dialogFormVisible" :close-on-click-modal="false" :close-on-press-escape="false">
+  <el-dialog title="修改人员" :visible.sync="dialogVisible" @close="dialogFormVisible" :close-on-click-modal="false" :close-on-press-escape="false">
     <!--form表单-->
     <el-form size="small" ref="form" :model="form" :rules="formRules" :label-width="formLabelWidth" v-loading="loading">
       <el-form-item label="用户名" prop="user_name">
         <el-input v-model="form.user_name" placeholder="请输入用户名"></el-input>
       </el-form-item>
-      <el-form-item label="所属角色" prop="role" v-if="form.role != 2">
+      <el-form-item label="所属分组" prop="gid">
+        <el-select v-model="form.gid">
+          <el-option v-for="item in groupList" :value="item.id" :key="item.id" :label="item.text"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="所属角色" prop="role">
         <el-select v-model="form.role">
           <el-option v-for="item in roleList" :value="item.role_id" :key="item.role_id" :label="item.role_name_h1"></el-option>
         </el-select>
@@ -41,16 +46,9 @@
         /*form表单对象*/
         form: {
           confirm_password: '',
-          role: ''
+          role: '',
+          group: 0
         },
-        /*角色对象*/
-        roleList: [{
-          role_id: 0,
-          role_name_h1: '超级管理员'
-        }, {
-          role_id: 1,
-          role_name_h1: '委员会'
-        }],
         /*form验证*/
         formRules: {
           user_name: [{
@@ -68,7 +66,19 @@
             message: ' ',
             trigger: 'blur'
           }]
-        }
+        },
+        /*角色对象*/
+        roleList: [{
+          role_id: 0,
+          role_name_h1: '超级管理员'
+        }, {
+          role_id: 1,
+          role_name_h1: '委员会'
+        }, {
+          role_id: 2,
+          role_name_h1: '律师'
+        }],
+        groupList: null
       };
     },
     props: ['open', 'shop_user_id'],
@@ -76,13 +86,33 @@
       open: function (n, o) {
         if (n != o) {
           this.dialogVisible = this.open;
-          this.getData();
+          if (this.open) {
+            this.getBaseData();
+            this.getData();
+          }
         }
       }
     },
     created() {},
     methods: {
-
+      /**
+       * 获取基础数据
+       */
+      getBaseData: function () {
+        let self = this;
+        self.loading = true;
+        AuthApi.userGroup({}, true)
+          .then(data => {
+            self.loading = false;
+            self.groupList = [{
+              id: 0,
+              text: '无分组'
+            }].concat(data.data.list.data);
+          })
+          .catch(error => {
+            self.loading = false;
+          });
+      },
       /*获取数据*/
       getData() {
         let self = this;

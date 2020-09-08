@@ -12,7 +12,6 @@ class Law extends LawModel
      */
     protected $hidden = [
         'app_id',
-        'status',
         'update_time',
     ];
 

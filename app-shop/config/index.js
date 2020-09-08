@@ -11,9 +11,9 @@ module.exports = {
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     proxyTable: {
-      '/index.php':{
-         target: 'http://127.0.0.1/shop.php/',
-         changeOrigin: true, // 如果接口跨域，需要进行这个参数配置
+      '/shop.php': {
+        target: 'http://127.0.0.1',
+        changeOrigin: true, // 如果接口跨域，需要进行这个参数配置
       }
     },
 
@@ -48,13 +48,13 @@ module.exports = {
     // Paths
     assetsRoot: path.resolve(__dirname, '../dist'),
     assetsSubDirectory: 'static',
-    assetsPublicPath: '/shop/',
+    assetsPublicPath: '/admin/',
 
     /**
      * Source Maps
      */
 
-    productionSourceMap: true,
+    productionSourceMap: false,
     // https://webpack.js.org/configuration/devtool/#production
     devtool: '#source-map',
 
@@ -62,7 +62,7 @@ module.exports = {
     // Surge or Netlify already gzip all static assets for you.
     // Before setting to `true`, make sure to:
     // npm install --save-dev compression-webpack-plugin
-    productionGzip: false,
+    productionGzip: true,
     productionGzipExtensions: ['js', 'css'],
 
     // Run the build command with an extra argument to

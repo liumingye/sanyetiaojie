@@ -3,7 +3,6 @@
 namespace app\common\model\settings;
 
 use think\facade\Cache;
-use app\common\enum\settings\DeliveryTypeEnum;
 use app\common\model\BaseModel;
 
 /**
@@ -39,10 +38,10 @@ class Setting extends BaseModel
     {
         $data = self::getAll($app_id);
         $data_key = $data[$key];
-        if(isset($data_key)){
+        if (isset($data_key)) {
             $data_key = $data[$key]['values'];
             jsonRecursive($data_key);
-        }else{
+        } else {
             $data_key = [];
         }
 
@@ -102,35 +101,15 @@ class Setting extends BaseModel
     /**
      * 默认配置
      */
-    public function defaultData($storeName = null)
+    public function defaultData()
     {
         return [
-            'store' => [
-                'key' => 'store',
-                'describe' => '商城设置',
+            'xcx' => [
+                'key' => 'xcx',
+                'describe' => '小程序设置',
                 'values' => [
-                    // 商城名称
-                    'name' => $storeName ?: '三叶调解',
-                    // 配送方式
-                    'delivery_type' => array_keys(DeliveryTypeEnum::data()),
-                    // 快递100
-                    'kuaidi100' => [
-                        'customer' => '',
-                        'key' => '',
-                    ]
+                    'aboutus' => ''
                 ],
-            ],
-            'trade' => [
-                'key' => 'trade',
-                'describe' => '交易设置',
-                'values' => [
-                    'order' => [
-                        'close_days' => '3',
-                        'receive_days' => '10',
-                        'refund_days' => '7'
-                    ],
-                    'freight_rule' => '10',
-                ]
             ],
             'storage' => [
                 'key' => 'storage',
@@ -163,5 +142,4 @@ class Setting extends BaseModel
             ],
         ];
     }
-
 }

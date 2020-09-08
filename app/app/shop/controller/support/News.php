@@ -18,10 +18,9 @@ class News extends Controller
             'text' => $text,
             'page' => $page,
             'list_rows' => 10,
-            'field' => 'id,title,create_time',
-            'status' => 1
+            'field' => 'id,title,author,source,create_time'
         ]);
-        
+
         return $this->renderSuccess('', $list);
     }
 
@@ -65,24 +64,26 @@ class News extends Controller
         }
         return $this->renderSuccess('删除成功');
     }
-    
+
     /**
      * 新闻详情
      */
-    public function info(){
+    public function info()
+    {
         $id = input('id', 0, 'intval');
-        $data = (new NewsModel)->getInfo($id);
-        if($data){
+        $data = (new NewsModel)->getInfo([
+            'id' => $id
+        ]);
+        if ($data) {
             return $this->renderSuccess('', $data);
-        }else{
+        } else {
             return $this->renderError('参数错误');
         }
     }
-    
-    public function getBaseData(){
+
+    public function getBaseData()
+    {
         $data = (new NewsModel)->getBaseData();
         return $this->renderSuccess('', $data);
-
     }
-
 }

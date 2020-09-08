@@ -87,9 +87,7 @@ class Lawyer extends Controller
     public function info()
     {
         $id = input('id', 0, 'intval');
-        $data = (new LawyerModel)->getInfo($id, ['shopUser' => function ($query) {
-            $query->field('shop_user_id,user_name');
-        }]);
+        $data = (new LawyerModel)->getInfo($id);
         if ($data) {
             return $this->renderSuccess('', $data);
         } else {

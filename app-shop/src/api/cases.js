@@ -4,19 +4,19 @@ let CasesApi = {
 
     /*分类管理*/
     catList(data, errorback) {
-        return request._post('support.casescat/index', data, errorback);
+        return request._post('support.casesCat/index', data, errorback);
     },
     /*分类添加*/
     catAdd(data, errorback) {
-        return request._post('support.casescat/add', data, errorback);
+        return request._post('support.casesCat/add', data, errorback);
     },
     /*分类删除*/
     catDel(data, errorback) {
-        return request._post('support.casescat/delete', data, errorback);
+        return request._post('support.casesCat/delete', data, errorback);
     },
     /*分类修改*/
     catEdit(data, errorback) {
-        return request._post('support.casescat/edit', data, errorback);
+        return request._post('support.casesCat/edit', data, errorback);
     },
     /*法律法规列表*/
     supportLists(data, errorback) {

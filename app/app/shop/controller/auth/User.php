@@ -12,10 +12,14 @@ use app\shop\model\shop\AccessRole as AccessRoleModel;
  */
 class User extends Controller
 {
-    public function index()
+    public function index($tree = 0)
     {
         $model = new UserModel();
-        $list = $model->getList();
+        if ($tree) {
+            $list = $model->getListTree();
+        } else {
+            $list = $model->getList();
+        }
         return $this->renderSuccess('', compact('list'));
     }
 
@@ -79,11 +83,12 @@ class User extends Controller
      */
     public function getUserInfo()
     {
-        $store = session('jjjshop_store');
+        $store = session('sy_store');
         $user = [];
         if (!empty($store)) {
             $user = $store['user'];
         }
-        return $this->renderSuccess('', compact('user'));
+        $version = get_version();
+        return $this->renderSuccess('', compact('user', 'version'));
     }
 }

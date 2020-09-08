@@ -23,7 +23,6 @@ class Cases extends Controller
             'page' => $page,
             'list_rows' => 10,
             'field' => 'id,category_id,title,create_time',
-            'status' => 1
         ]);
 
         foreach($list as &$vo){
@@ -86,7 +85,9 @@ class Cases extends Controller
      */
     public function info(){
         $id = input('id', 0, 'intval');
-        $data = (new CasesModel)->getInfo($id);
+        $data = (new CasesModel)->getInfo([
+            'id' => $id
+        ]);
         if($data){
             return $this->renderSuccess('', $data);
         }else{

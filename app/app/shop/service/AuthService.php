@@ -2,10 +2,8 @@
 
 namespace app\shop\service;
 
-use app\common\model\shop\Access;
 use think\facade\Session;
 use app\shop\model\auth\User;
-use app\shop\model\auth\AccessRole;
 
 use app\shop\model\shop\Access as AccessModel;
 use app\shop\model\shop\AccessRole as AccessRoleModel;
@@ -26,28 +24,24 @@ class AuthService
 
     // 权限验证白名单
     protected $allowAllAction = [
-        'auth/user/getRoleList',
-        'index/test',
-        // 测试入口
-        'index/test',
         // 用户登录
         'passport/login',
         // 退出登录
         'passport/logout',
+        // 修改密码
+        'passport/editPass',
+        // 获取权限列表
+        'auth/user/getRoleList',
+        // 获取用户信息
+        'auth/user/getUserInfo',
         // 修改当前用户信息
-        'store.user/renew',
+        // 'store.user/renew',
         // 文件库
-        'upload.library/*',
+        // 'upload.library/*',
         // 图片上传
-        'upload/image',
+        // 'upload/image',
         // 数据选择
-        'data/*',
-        // 添加商品规格
-        'product.spec/*',
-        // 物流公司编码表
-        'setting.express/company',
-        // 腾讯地图坐标选取器
-        'shop/getpoint',
+        // 'data/*',
     ];
 
     /** @var array $accessUrls 商家用户权限url */
@@ -72,7 +66,7 @@ class AuthService
     private function __construct()
     {
         // 商家登录信息
-        $this->store = Session::get('jjjshop_store');
+        $this->store = Session::get('sy_store');
         // 当前用户信息
         $this->user = User::detail($this->store['user']['shop_user_id']);
     }

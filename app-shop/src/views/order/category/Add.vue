@@ -1,21 +1,18 @@
 <template>
-  <!--
-    	作者：wangxw
-    	时间：2019-10-26
-    	描述：产品分类-添加
-    -->
-  <el-dialog title="添加分类" :visible.sync="dialogVisible" @close="dialogFormVisible" :close-on-click-modal="false"
-    :close-on-press-escape="false">
+  <el-dialog title="添加分类" :visible.sync="dialogVisible" @close="dialogFormVisible" :close-on-click-modal="false" :close-on-press-escape="false">
     <el-form size="small" :model="form" :rules="formRules" ref="form">
       <el-form-item label="分类名称" prop="name" :label-width="formLabelWidth">
         <el-input v-model="form.name" autocomplete="off"></el-input>
+      </el-form-item>
+      <el-form-item label="分类描述" prop="text" :label-width="formLabelWidth">
+        <el-input v-model.number="form.text" autocomplete="off"></el-input>
       </el-form-item>
       <el-form-item label="分类排序" prop="sort" :label-width="formLabelWidth">
         <el-input v-model.number="form.sort" autocomplete="off"></el-input>
       </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">
-      <el-button @click="dialogFormVisible">取 消</el-button>
+      <el-button @click="dialogFormVisible(0)">取 消</el-button>
       <el-button type="primary" @click="addUser" :loading="loading">确 定</el-button>
     </div>
   </el-dialog>
@@ -33,7 +30,8 @@
           parent_id: '0',
           name: '',
           sort: 100,
-          image_id: ''
+          image_id: '',
+          text: ''
         },
         /*验证规则*/
         formRules: {
@@ -104,4 +102,5 @@
       },
     }
   };
+
 </script>

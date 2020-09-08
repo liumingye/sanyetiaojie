@@ -12,7 +12,6 @@ class Cases extends CasesModel
      */
     protected $hidden = [
         'app_id',
-        'status',
         'update_time',
     ];
 

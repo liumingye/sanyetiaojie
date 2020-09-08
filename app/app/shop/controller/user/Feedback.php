@@ -19,7 +19,7 @@ class Feedback extends Controller
         $category = $model->getCacheTreeSimple();
         $category = array_combine(array_column($category, 'cid'), $category);
 
-        // 订单列表
+        // 列表
         $model = new FeedbackModel();
         $list = $model->getList($this->postData());
 
@@ -29,6 +29,22 @@ class Feedback extends Controller
             } else {
                 $vo['category_name'] = '未分类';
             }
+            // 获取摘要
+            $content = trim($vo['text']);
+            $content = preg_replace("@<script(.*?)</script>@is", "", $content);
+            $content = preg_replace("@<iframe(.*?)</iframe>@is", "", $content);
+            $content = preg_replace("@<style(.*?)</style>@is", "", $content);
+            $content = preg_replace("@<(.*?)>@is", "", $content);
+            $content = str_replace(PHP_EOL, '', $content);
+            $space = array(" ", "　", "  ", " ", " ");
+            $go_away = array("", "", "", "", "");
+            $content = str_replace($space, $go_away, $content);
+            $count = 75;
+            $res = mb_substr($content, 0, $count, 'UTF-8');
+            if (mb_strlen($content, 'UTF-8') > $count) {
+                $res = $res . "...";
+            }
+            $vo['text'] = $res;
         }
 
         return $this->renderSuccess('', compact('list'));
@@ -39,7 +55,9 @@ class Feedback extends Controller
      */
     public function detail($id)
     {
-        $detail = FeedbackModel::detail($id);
+        $detail = FeedbackModel::detail($id, ['user' => function ($query) {
+            $query->field('user_id,nickName');
+        }, 'image.file']);
         return $this->renderSuccess('', compact('detail'));
     }
 }

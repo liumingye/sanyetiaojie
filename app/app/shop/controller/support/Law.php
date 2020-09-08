@@ -22,14 +22,13 @@ class Law extends Controller
             'text' => $text,
             'page' => $page,
             'list_rows' => 10,
-            'field' => 'id,category_id,title,create_time',
-            'status' => 1
+            'field' => 'id,category_id,title,create_time'
         ]);
 
-        foreach($list as &$vo){
-            if(isset($category[$vo['category_id']])){
+        foreach ($list as &$vo) {
+            if (isset($category[$vo['category_id']])) {
                 $vo['category_name'] = $category[$vo['category_id']]['name'];
-            }else{
+            } else {
                 $vo['category_name'] = '未分类';
             }
         }
@@ -80,24 +79,26 @@ class Law extends Controller
         }
         return $this->renderSuccess('删除成功');
     }
-    
+
     /**
      * 法律详情
      */
-    public function info(){
+    public function info()
+    {
         $id = input('id', 0, 'intval');
-        $data = (new LawModel)->getInfo($id);
-        if($data){
+        $data = (new LawModel)->getInfo([
+            'id' => $id
+        ]);
+        if ($data) {
             return $this->renderSuccess('', $data);
-        }else{
+        } else {
             return $this->renderError('参数错误');
         }
     }
-    
-    public function getBaseData(){
+
+    public function getBaseData()
+    {
         $data = (new LawModel)->getBaseData();
         return $this->renderSuccess('', $data);
-
     }
-
 }
