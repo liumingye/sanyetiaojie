@@ -33,7 +33,7 @@
               {{ detail.times }}次
             </div>
           </el-col>
-          <el-col :md="8" :lg="5">
+          <el-col :md="8" :lg="5" v-if="detail.user && detail.user.nickName">
             <div class="pb16">
               <span class="gray9">用户：</span>
               {{ detail.user.nickName }}
@@ -142,12 +142,16 @@
         </el-row>
         <div class="common-form mt10" v-if="detail.image.length > 0">附件</div>
         <el-row>
-          <el-col v-for="(item,index) in detail.image" :key="index" class="file-col">
+          <el-col v-for="(item,index) in detail.image" :key="index" class="file-col mr10 mb10">
             <a :href="item.file_path" target="_blank">
-              <video class="mr10 mb10" :src="item.file_path" v-if="item.file_type == 'video'"></video>
-              <el-image class="mr10 mb10" :src="item.file_path" v-else-if="item.file_type == 'image'"></el-image>
-              <el-image class="mr10 mb10" :src="fileimg_url" v-else></el-image>
+              <video :src="item.file_path" v-if="item.file_type == 'video'"></video>
+              <el-image :src="item.thumb_path ? item.thumb_path : item.file_path" v-else-if="item.file_type == 'image'"></el-image>
+              <el-image :src="fileimg_url" v-else></el-image>
             </a>
+            <el-tooltip effect="dark" :content="item.real_name" placement="top">
+              <span style="display:block;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center;">{{item.real_name}}</span>
+            </el-tooltip>
+            <el-button @click="delImage(item)" type="text" :loading="loading" style="display:block;width:100%;padding:2px;">删除</el-button>
           </el-col>
         </el-row>
       </div>
@@ -159,7 +163,11 @@
       </el-row>
     </div>
     <div v-loading="loading" v-else-if="activeName=='schedule'">
-      <div class="common-form">进度</div>
+      <div class="common-form">操作</div>
+      <el-row>
+        <el-button @click="addSchedule()" :loading="loading">添加进度</el-button>
+      </el-row>
+      <div class="common-form mt10">进度</div>
       <el-timeline>
         <div v-for="(activity, index) in detail.info" :key="index">
           <div v-if="(index != 0 && detail.info[index].times != detail.info[index-1].times) || index == 0">
@@ -175,15 +183,10 @@
           </el-timeline-item>
         </div>
       </el-timeline>
-      <div class="common-form">操作</div>
-      <el-row>
-        <el-button @click="addSchedule()" :loading="loading">添加进度</el-button>
-      </el-row>
     </div>
     <div v-loading="loading" v-else-if="activeName=='operate'">
-      <div class="common-form" v-if="detail.status==1">调解方式</div>
-      <div class="common-form" v-else>操作</div>
-      <el-row v-if="detail.status==1">
+      <div class="common-form">调解操作</div>
+      <el-row v-if="detail.status==1||detail.status==4">
         <el-button @click="setWay(1)" :loading="loading">电话调解</el-button>
         <el-button @click="setWay(2)" :loading="loading">调委会调解</el-button>
       </el-row>
@@ -203,8 +206,7 @@
         </el-col>
         <el-col class="pb16">
           <div class="mb10">选择人员：</div>
-          <el-tree :data="userList" show-checkbox node-key="id" ref="userList" highlight-current :props="defaultProps">
-          </el-tree>
+          <el-tree :data="userList" :default-checked-keys="detail.staff" show-checkbox node-key="id" ref="userList" highlight-current :props="defaultProps"></el-tree>
         </el-col>
         <el-button @click="setRole()" type="primary" :loading="loading">确认操作</el-button>
         <el-button @click="setWay(0)" :loading="loading">选择其他调解</el-button>
@@ -230,7 +232,33 @@
         <el-button @click="setWay(0)" :loading="loading">选择其他调解</el-button>
       </el-row>
       <el-row v-if="detail.status==3">
-        <el-button @click="getWord(2)" :loading="loading" v-auth="'/order/mediate/getword'">结案书</el-button>
+        <el-form size="small" label-width="100px" :model="wordForm">
+          <el-form-item label="案情概述">
+            <el-input v-model="wordForm.summary" type="textarea" :autosize="{ minRows: 4}" class="max-w460"></el-input>
+          </el-form-item>
+          <el-form-item label="调解过程">
+            <el-input v-model="wordForm.process" type="textarea" :autosize="{ minRows: 4}" class="max-w460"></el-input>
+          </el-form-item>
+          <el-form-item label="调解协议内容">
+            <el-input v-model="wordForm.agreement" type="textarea" :autosize="{ minRows: 4}" class="max-w460"></el-input>
+          </el-form-item>
+          <el-form-item label="承办调解员">
+            <el-input v-model="wordForm.mediator" type="textarea" :autosize="{ minRows: 4}" class="max-w460"></el-input>
+          </el-form-item>
+          <el-form-item label="结案时间">
+            <el-date-picker v-model="wordForm.closing_time" type="datetime" placeholder="选择进度时间"></el-date-picker>
+          </el-form-item>
+          <el-form-item label="记录人">
+            <el-input v-model="wordForm.closing_person" type="text" class="max-w460"></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-button @click="getWord(2)" type="primary" :loading="loading" v-auth="'/order/mediate/getword'">生成结案书</el-button>
+          </el-form-item>
+        </el-form>
+      </el-row>
+      <div class="common-form mt10">其他操作</div>
+      <el-row>
+        <el-button @click="allowEdit()" :loading="loading" :disabled="detail.allow_edit == 1 ? true : false">允许用户编辑一次附件</el-button>
       </el-row>
     </div>
     <div class="common-button-wrapper">
@@ -242,283 +270,414 @@
 </template>
 
 <script>
-  import OrderApi from "@/api/order.js";
-  import fileimg from "@/assets/img/icon/file.png";
-  import AddSchedule from './dialog/addSchedule.vue';
+import OrderApi from "@/api/order.js";
+import fileimg from "@/assets/img/icon/file.png";
+import AddSchedule from "./dialog/addSchedule.vue";
 
-  export default {
-    components: {
-      AddSchedule
-    },
-    data() {
-      return {
-        fileimg_url: fileimg,
-        open_addSchedule: false,
-        activeName: "info",
-        /*是否加载完成*/
-        loading: true,
-        /*案件数据*/
-        detail: {
-          user: {},
-          image: {},
-          court_time: null,
-          court_address: ''
+export default {
+  components: {
+    AddSchedule,
+  },
+  data() {
+    return {
+      fileimg_url: fileimg,
+      open_addSchedule: false,
+      activeName: "info",
+      /*是否加载完成*/
+      loading: true,
+      /*案件数据*/
+      detail: {
+        user: {},
+        image: {},
+        court_time: null,
+        court_address: "",
+      },
+      remark: "",
+      userList: null,
+      defaultProps: {
+        children: "children",
+        label: "lable",
+      },
+      wordForm: {
+        summary: "",
+        process: "",
+        agreement: "",
+        mediator: "",
+        closing_time: "",
+        closing_person: "",
+      },
+    };
+  },
+  created() {
+    /*获取列表*/
+    this.getData();
+  },
+  methods: {
+    /*编辑详情*/
+    editInfo(event) {
+      let self = this;
+      let name = event.target.attributes.name.value;
+      let value =
+        event.target.nodeName == "TEXTAREA"
+          ? event.target.value
+          : event.target.textContent;
+      if (self.detail[name] === value) {
+        return;
+      }
+      self.loading = true;
+      if (self.detail[name] != "") {
+        self.detail[name] = value;
+      }
+      // 取到路由带过来的参数
+      const params = self.$route.query.id;
+      OrderApi.editInfo(
+        {
+          id: params,
+          name: name,
+          value: value,
         },
-        remark: '',
-        userList: null,
-        defaultProps: {
-          children: 'children',
-          label: 'lable'
-        }
-      };
+        true
+      )
+        .then((data) => {
+          self.loading = false;
+          if (data.code == 1) {
+            self.$message({
+              message: data.msg,
+              type: "success",
+            });
+          } else {
+            self.$message({
+              message: data.msg,
+              type: "error",
+            });
+            self.getData();
+          }
+        })
+        .catch((error) => {
+          self.loading = false;
+        });
     },
-    created() {
-      /*获取列表*/
-      this.getData();
+    getUserList() {
+      let self = this;
+      self.loading = true;
+      OrderApi.userList(
+        {
+          tree: 1,
+        },
+        true
+      )
+        .then((data) => {
+          self.loading = false;
+          self.userList = data.data.list;
+        })
+        .catch((error) => {
+          self.loading = false;
+        });
     },
-    methods: {
-      /*编辑详情*/
-      editInfo(event) {
-        let self = this;
-        let name = event.target.attributes.name.value;
-        let value = event.target.nodeName == "TEXTAREA" ? event.target.value : event.target.textContent;
-        if (self.detail[name] === value) {
-          return;
-        }
-        self.loading = true;
-        if (self.detail[name] != '') {
-          self.detail[name] = value;
-        }
-        // 取到路由带过来的参数
-        const params = self.$route.query.id;
-        OrderApi.editInfo({
-              id: params,
-              name: name,
-              value: value
+    /*获取参数*/
+    getData() {
+      let self = this;
+      self.loading = true;
+      // 取到路由带过来的参数
+      const params = this.$route.query.id;
+      OrderApi.orderdetail(
+        {
+          id: params,
+        },
+        true
+      )
+        .then((data) => {
+          self.loading = false;
+          self.detail = data.data.detail;
+          self.remark = self.detail.remark;
+          self.wordForm = {
+            summary: self.detail.summary,
+            process: self.detail.process,
+            agreement: self.detail.agreement,
+            mediator: self.detail.mediator,
+            closing_time: self.detail.closing_time,
+            closing_person: self.detail.closing_person,
+          };
+          if (self.wordForm.closing_time == 0) {
+            self.wordForm.closing_time = new Date().valueOf();
+          }
+          if (self.detail.court_time == 0) {
+            self.detail.court_time = new Date().valueOf();
+            self.detail.court_time = "";
+          }
+          if (
+            self.detail.status == 2 &&
+            self.detail.way == 2 &&
+            self.userList == null
+          ) {
+            self.getUserList();
+          }
+        })
+        .catch((error) => {
+          self.loading = false;
+        });
+    },
+    /*返回*/
+    cancelFunc() {
+      this.$router.go(-1);
+    },
+    /*设置调解方式*/
+    setWay(way) {
+      let self = this;
+      self.loading = true;
+      let id = this.$route.query.id;
+      OrderApi.setWay(
+        {
+          id: id,
+          way: way,
+        },
+        true
+      )
+        .then((data) => {
+          self.loading = false;
+          self.$message({
+            message: data.msg,
+            type: "success",
+          });
+          self.getData();
+        })
+        .catch((error) => {
+          self.loading = false;
+        });
+    },
+    /*调解完成*/
+    setComplete() {
+      let self = this;
+      let id = this.$route.query.id;
+      self
+        .$confirm("确认执行此操作？", "提示", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
+        })
+        .then(() => {
+          self.loading = true;
+          OrderApi.setComplete(
+            {
+              id: id,
             },
             true
           )
-          .then((data) => {
-            self.loading = false;
-            if (data.code == 1) {
+            .then((data) => {
+              self.loading = false;
               self.$message({
                 message: data.msg,
                 type: "success",
               });
-            } else {
+              self.getData();
+            })
+            .catch((error) => {
+              self.loading = false;
+            });
+        })
+        .catch(() => {
+          self.loading = false;
+        });
+    },
+    /*调解失败*/
+    setFail(type) {
+      let self = this;
+      let id = this.$route.query.id;
+      self
+        .$confirm("确认执行此操作？", "提示", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
+        })
+        .then(() => {
+          self.loading = true;
+          OrderApi.setFail(
+            {
+              id: id,
+              type: type,
+            },
+            true
+          )
+            .then((data) => {
+              self.loading = false;
               self.$message({
                 message: data.msg,
-                type: "error",
+                type: "success",
               });
               self.getData();
-            }
-          })
-          .catch((error) => {
-            self.loading = false;
-          });
-      },
-      getUserList() {
-        let self = this;
-        self.loading = true;
-        OrderApi.userList({
-              tree: 1
-            },
-            true
-          )
-          .then((data) => {
-            self.loading = false;
-            self.userList = data.data.list;
-          })
-          .catch((error) => {
-            self.loading = false;
-          });
-      },
-      /*获取参数*/
-      getData() {
-        let self = this;
-        self.loading = true;
-        // 取到路由带过来的参数
-        const params = this.$route.query.id;
-        OrderApi.orderdetail({
-              id: params,
-            },
-            true
-          )
-          .then((data) => {
-            self.loading = false;
-            self.detail = data.data.detail;
-            self.remark = self.detail.remark;
-            if (self.detail.court_time == 0) {
-              self.detail.court_time = (new Date()).valueOf();
-              self.detail.court_time = '';
-            }
-            if (self.detail.status == 2 && self.detail.way == 2 && self.userList == null) {
-              self.getUserList();
-            }
-          })
-          .catch((error) => {
-            self.loading = false;
-          });
-      },
-      /*返回*/
-      cancelFunc() {
-        this.$router.go(-1);
-      },
-      /*设置调解方式*/
-      setWay(way) {
-        let self = this;
-        self.loading = true;
-        let id = this.$route.query.id;
-        OrderApi.setWay({
-              id: id,
-              way: way,
-            },
-            true
-          )
-          .then((data) => {
-            self.loading = false;
-            self.$message({
-              message: data.msg,
-              type: "success",
+            })
+            .catch((error) => {
+              self.loading = false;
             });
-            self.getData();
-          })
-          .catch((error) => {
-            self.loading = false;
-          });
-      },
-      /*调解完成*/
-      setComplete() {
-        let self = this;
-        self.loading = true;
-        let id = this.$route.query.id;
-        OrderApi.setComplete({
-              id: id,
-            },
-            true
-          )
-          .then((data) => {
-            self.loading = false;
-            self.$message({
-              message: data.msg,
-              type: "success",
-            });
-            self.getData();
-          })
-          .catch((error) => {
-            self.loading = false;
-          });
-      },
-      /*调解失败*/
-      setFail(type) {
-        let self = this;
-        self.loading = true;
-        let id = this.$route.query.id;
-        OrderApi.setFail({
-              id: id,
-              type: type
-            },
-            true
-          )
-          .then((data) => {
-            self.loading = false;
-            self.$message({
-              message: data.msg,
-              type: "success",
-            });
-            self.getData();
-          })
-          .catch((error) => {
-            self.loading = false;
-          });
-      },
-      setRole() {
-        let self = this;
-        self.loading = true;
-        let id = self.$route.query.id;
-        OrderApi.setRole({
-              id: id,
-              court_time: self.detail.court_time,
-              court_address: self.detail.court_address,
-              userlist: self.$refs.userList.getCheckedKeys()
-            },
-            true
-          )
-          .then((data) => {
-            self.loading = false;
-            self.getData();
-          })
-          .catch((error) => {
-            self.loading = false;
-          });
-      },
-      /*获取WORD*/
-      getWord(type) {
-        let self = this;
-        let id = self.$route.query.id;
-        window.open(OrderApi.getWord() + "?id=" + id + "&type=" + type, "_blank");
-      },
-      /*切换菜单*/
-      handleClick(tab, event) {
-        let self = this;
-      },
-      addSchedule() {
-        this.open_addSchedule = true;
-      },
-      delSchedule(id) {
-        let self = this;
-        self.loading = true;
-        OrderApi.delSchedule({
-              id: id
-            },
-            true
-          )
-          .then((data) => {
-            self.loading = false;
-            self.$message({
-              message: data.msg,
-              type: "success",
-            });
-            self.getData();
-          })
-          .catch((error) => {
-            self.loading = false;
-          });
-      },
-      /*关闭弹窗*/
-      closeDialogFunc(e, f) {
-        if (f == 'addSchedule') {
-          this.open_addSchedule = e.openDialog;
-          if (e.type == 'success') {
-            this.getData();
-          }
-        }
-      },
-
+        })
+        .catch(() => {
+          self.loading = false;
+        });
     },
-  };
-
+    setRole() {
+      let self = this;
+      self.loading = true;
+      let id = self.$route.query.id;
+      OrderApi.setRole(
+        {
+          id: id,
+          court_time: self.detail.court_time,
+          court_address: self.detail.court_address,
+          userlist: self.$refs.userList.getCheckedKeys(),
+        },
+        true
+      )
+        .then((data) => {
+          self.loading = false;
+          self.getData();
+        })
+        .catch((error) => {
+          self.loading = false;
+        });
+    },
+    /*删除附件*/
+    delImage(item) {
+      let self = this;
+      let id = item.id;
+      self
+        .$confirm("此操作将永久删除该记录, 是否继续?", "提示", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
+        })
+        .then(() => {
+          self.loading = true;
+          OrderApi.delImage(
+            {
+              id: id,
+            },
+            true
+          )
+            .then((data) => {
+              self.loading = false;
+              if (data.code == 1) {
+                self.$message({
+                  message: "删除成功",
+                  type: "success",
+                });
+                self.getData();
+              }
+            })
+            .catch((error) => {
+              self.loading = false;
+            });
+        })
+        .catch(() => {
+          self.loading = false;
+        });
+    },
+    /*获取WORD*/
+    getWord(type) {
+      let self = this;
+      self.loading = true;
+      let id = self.$route.query.id;
+      let params = {
+        id: id,
+        type: type,
+      };
+      if (type == 2) {
+        Object.assign(params, self.wordForm);
+      }
+      OrderApi.getWord(params)
+        .then((data) => {
+          self.loading = false;
+          window.open(data.data.url, "_blank");
+        })
+        .catch((error) => {
+          self.loading = false;
+        });
+    },
+    /*允许编辑一次附件*/
+    allowEdit() {
+      let self = this;
+      self.loading = true;
+      let id = self.$route.query.id;
+      OrderApi.allowEdit(
+        {
+          id: id,
+        },
+        true
+      )
+        .then((data) => {
+          self.loading = false;
+          self.getData();
+        })
+        .catch((error) => {
+          self.loading = false;
+        });
+    },
+    /*切换菜单*/
+    handleClick(tab, event) {
+      let self = this;
+    },
+    addSchedule() {
+      this.open_addSchedule = true;
+    },
+    delSchedule(id) {
+      let self = this;
+      self.loading = true;
+      OrderApi.delSchedule(
+        {
+          id: id,
+        },
+        true
+      )
+        .then((data) => {
+          self.loading = false;
+          self.$message({
+            message: data.msg,
+            type: "success",
+          });
+          self.getData();
+        })
+        .catch((error) => {
+          self.loading = false;
+        });
+    },
+    /*关闭弹窗*/
+    closeDialogFunc(e, f) {
+      if (f == "addSchedule") {
+        this.open_addSchedule = e.openDialog;
+        if (e.type == "success") {
+          this.getData();
+        }
+      }
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped>
-  span[contenteditable] {
-    display: inline-block;
-    min-width: 40px;
-  }
+span[contenteditable] {
+  display: inline-block;
+  min-width: 40px;
+}
 
-  .file-col {
-    width: auto;
+.file-col {
+  width: auto;
+  /deep/ .el-image {
+    width: 100px;
+    height: 100px;
   }
-
-  .file-col /deep/ img,
-  .file-col /deep/ video {
+  /deep/ .el-image__error {
+    width: 100px;
+    height: 100px;
+  }
+  /deep/ img,
+  /deep/ video {
     width: 100px;
     height: 100px;
     background-color: #fafafa;
     object-fit: cover;
   }
-  /deep/ .el-timeline-item__tail{
-    display: block!important;
-  }
+}
 
+/deep/ .el-timeline-item__tail {
+  display: block !important;
+}
 </style>

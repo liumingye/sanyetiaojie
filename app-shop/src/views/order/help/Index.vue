@@ -27,7 +27,7 @@
               <template v-else>
                 <div class="info">
                   <div class="name gray3">
-                    <span>{{ scope.row.user.nickName }}</span>
+                    <span v-if="scope.row.user && scope.row.user.nickName">{{ scope.row.user.nickName }}</span>
                     <div class="gray9">用户ID：({{ scope.row.uid }})</div>
                   </div>
                 </div>

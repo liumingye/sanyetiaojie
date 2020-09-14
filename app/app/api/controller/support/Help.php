@@ -49,7 +49,7 @@ class Help extends Controller
                     ]);
                 }
                 // 发系统消息
-                (new NoticeModel)->sendSystemNotice($data['uid'], '您有一个纠纷待调解');
+                (new NoticeModel)->sendSystemNotice($data['uid'], '您有1条咨询信息已提交，等待处理！');
                 return $this->renderSuccess('提交成功');
             }
             return $this->renderError($model->getError() ?: '提交失败');

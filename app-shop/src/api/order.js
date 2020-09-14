@@ -29,16 +29,16 @@ let OrderApi = {
     return request._post('order.mediate/setrole', data, errorback);
   },
   /*获取文档*/
-  getWord() {
-    return request.getbaseURL() + 'order.mediate/getword';
+  getWord(data, errorback) {
+    return request._post('order.mediate/getWord', data, errorback);
   },
   /*添加进度*/
   addSchedule(data, errorback) {
-    return request._post('order.mediate/addschedule', data, errorback);
+    return request._post('order.mediate/addSchedule', data, errorback);
   },
   /*删除进度*/
   delSchedule(data, errorback) {
-    return request._post('order.mediate/delschedule', data, errorback);
+    return request._post('order.mediate/delSchedule', data, errorback);
   },
   /*获取通知ID*/
   getNotice(data, errorback) {
@@ -47,6 +47,14 @@ let OrderApi = {
   /*编辑详情*/
   editInfo(data, errorback) {
     return request._post('order.mediate/editInfo', data, errorback);
+  },
+  /*删除附件*/
+  delImage(data, errorback) {
+    return request._post('order.mediate/delImage', data, errorback);
+  },
+  /*允许编辑一次附件*/
+  allowEdit(data, errorback) {
+    return request._post('order.mediate/allowEdit', data, errorback);
   },
 }
 

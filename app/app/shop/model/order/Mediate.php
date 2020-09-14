@@ -18,6 +18,14 @@ class Mediate extends MediateModel
     ];
 
     /**
+     * 关联人员表
+     */
+    public function staff()
+    {
+        return $this->hasMany('app\\shop\\model\\order\\MediateRelation', 'mid', 'id');
+    }
+
+    /**
      * 订单列表
      */
     public function getList($type, $params = null, $user = null)
@@ -50,6 +58,9 @@ class Mediate extends MediateModel
                 break;
             case 'adjusted';
                 $filter['status'] = 3;
+                break;
+            case 'fail';
+                $filter['status'] = 4;
                 break;
         }
         // 获取数据列表
@@ -84,6 +95,9 @@ class Mediate extends MediateModel
             case 'adjusted';
                 $filter['status'] = 3;
                 break;
+            case 'fail';
+                $filter['status'] = 4;
+                break;
         }
         return $this->where($filter)->count();
     }
@@ -104,6 +118,9 @@ class Mediate extends MediateModel
                 break;
             case 'adjusted';
                 $filter['status'] = 3;
+                break;
+            case 'fail';
+                $filter['status'] = 4;
                 break;
         }
         $model = $this->alias('a');
@@ -143,4 +160,5 @@ class Mediate extends MediateModel
             return false;
         }
     }
+
 }

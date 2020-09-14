@@ -22,7 +22,7 @@ router.beforeEach(async (to, from, next) => {
     if (shop_name && typeof (shop_name) != 'undefined') {
       document.title = to.meta.title + '-' + shop_name;
     } else {
-      document.title = to.meta.title + '-三叶调解管理系统';
+      document.title = to.meta.title + '-太湖街道一码解忧管理系统';
     }
 
   }

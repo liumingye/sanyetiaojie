@@ -43,9 +43,13 @@ class User extends UserModel
     public function getList($params)
     {
         $model = $this;
-        //检索：用户名
+        //检索：昵称
         if (!empty($params['nick_name'])) {
             $model = $model->where('nickName', 'like', '%' . trim($params['nick_name']) . '%');
+        }
+        //检索：用户ID
+        if (!empty($params['id'])) {
+            $model = $model->where('user_id',  trim($params['id']));
         }
         //检索：注册时间
         if (!empty($params['value1'][0])) {
@@ -93,6 +97,4 @@ class User extends UserModel
     {
         return $this->where(['user_id' => $userId])->dec('expend_money', $expendMoney)->update();
     }
-
-
 }

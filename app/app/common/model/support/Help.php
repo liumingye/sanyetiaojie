@@ -20,7 +20,7 @@ class Help extends BaseModel
     public function getStateTextAttr($value, $data)
     {
         if ($data['status'] == 1) {
-            return '待受理';
+            return '待调解';
         } else if ($data['status'] == 2) {
             return '调解中';
         } else if ($data['status'] == 3) {

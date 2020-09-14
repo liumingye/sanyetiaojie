@@ -31,6 +31,10 @@ let HelpApi = {
   editInfo(data, errorback) {
     return request._post('support.help/editInfo', data, errorback);
   },
+  /*删除附件*/
+  delImage(data, errorback) {
+    return request._post('support.help/delImage', data, errorback);
+  },
 }
 
 export default HelpApi;

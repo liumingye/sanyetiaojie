@@ -29,10 +29,10 @@ class Local extends Server
     {
         $saveName = '';
         // 验证文件并上传
-        try{
-            $saveName = Filesystem::disk('public')->putFile( '', $this->file);
-        }catch (\Exception $e){
-            log_write('文件上传异常:'.$e->getMessage());
+        try {
+            $saveName = Filesystem::disk('public')->putFile('', $this->file);
+        } catch (\Exception $e) {
+            log_write('文件上传异常:' . $e->getMessage());
         }
         return $saveName;
     }
@@ -43,7 +43,7 @@ class Local extends Server
     private function uploadByInternal()
     {
         // 上传目录
-        $uplodDir = WEB_PATH . 'uploads';
+        $uplodDir = public_path('public') . 'uploads';
         // 要上传图片的本地路径
         $realPath = $this->getRealPath();
         if (!rename($realPath, "{$uplodDir}/$this->fileName")) {
@@ -59,7 +59,7 @@ class Local extends Server
     public function delete($fileName)
     {
         // 文件所在目录
-        $filePath = WEB_PATH . "uploads/{$fileName}";
+        $filePath = public_path('public') . "uploads/{$fileName}";
         return !file_exists($filePath) ?: unlink($filePath);
     }
 
@@ -70,5 +70,4 @@ class Local extends Server
     {
         return $this->fileName;
     }
-
 }

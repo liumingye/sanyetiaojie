@@ -9,7 +9,7 @@ class User extends Controller
 {
     public function index()
     {
-        // 获取我的 待受理 已调解 正在调解 个数
+        // 获取我的 待调解 已调解 正在调解 个数
         $user = $this->getUser(false);
         $user_id = $user['user_id'];
         $mediate_count = [

@@ -82,4 +82,16 @@ class Notice extends BaseModel
         ]);
         return $res;
     }
+
+    /**
+     * 获取消息总量
+     * type 1 获取系统未读消息数
+     */
+    public function getNoticeTotal($type)
+    {
+        if ($type == 1) {
+            return $this->sum('admin_unread');
+        }
+        return 0;
+    }
 }

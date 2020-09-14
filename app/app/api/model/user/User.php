@@ -43,7 +43,7 @@ class User extends UserModel
         // 自动注册用户
         $userInfo = json_decode(htmlspecialchars_decode($post['user_info']), true);
 
-        $model = $this->register($session['openid'], $userInfo, $session['session_key']);
+        $model = $this->register($session['openid'], $userInfo);
         $this->token = $session['openid'];
         return $model['user_id'];
     }
@@ -53,11 +53,13 @@ class User extends UserModel
      */
     public function getPhone($post)
     {
+        // 微信登录 获取session_key
         $app = AppWx::getApp();
-        $user = $this->getUser($post['token']);
-        $decryptedData = $app->encryptor->decryptData($user['session_key'], $post['iv'], $post['encryptedData']);
+        $session = $app->auth->session($post['code']);
+        $decryptedData = $app->encryptor->decryptData($session['session_key'], $post['iv'], $post['encryptedData']);
         try {
             $this->startTrans();
+            $user = $this->getUser($post['token']);
             $this->where('user_id', $user['user_id'])->save([
                 'mobile' => $decryptedData['phoneNumber']
             ]);
@@ -78,21 +80,19 @@ class User extends UserModel
     /**
      * 自动注册用户
      */
-    private function register($open_id, $data, $session_key = '')
+    private function register($open_id, $data)
     {
         $user = self::detail(['open_id' => $open_id]) ?: $this;
         if ($user) {
             $model = $user;
         } else {
             $model = $this;
-            $data['reg_source'] = 'wx';
         }
         $this->startTrans();
         try {
             // 保存/更新用户记录
             if (!$model->save(array_merge($data, [
                 'open_id' => $open_id,
-                'session_key' => $session_key,
                 'app_id' => self::$app_id
             ]))) {
                 throw new BaseException(['msg' => '用户注册失败']);

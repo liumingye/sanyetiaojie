@@ -58,6 +58,14 @@ class Feedback extends Controller
         $detail = FeedbackModel::detail($id, ['user' => function ($query) {
             $query->field('user_id,nickName');
         }, 'image.file']);
+        foreach ($detail->image as $vo) {
+            if (isset($vo->save_name)) {
+                if ($vo->file_type == 'image') {
+                    $vo->thumb_path =  base_url() . "shop.php/image.thumb?src=" . $vo->save_name;
+                }
+                unset($vo->save_name);
+            }
+        }
         return $this->renderSuccess('', compact('detail'));
     }
 }

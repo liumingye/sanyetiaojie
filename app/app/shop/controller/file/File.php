@@ -68,15 +68,14 @@ class File extends SyController
     /**
      * 批量删除文件
      */
-    public function deleteFiles($fileIds)
+    public function deleteFiles($fileIds = [])
     {
         $model = new UploadFileModel;
-        if ($model->softDelete($fileIds)) {
+        if ($model->remove($fileIds)) {
             return $this->renderSuccess('删除成功');
         }
         return $this->renderError($model->getError() ?: '删除失败');
     }
-
 
     /**
      * 批量移动文件分组

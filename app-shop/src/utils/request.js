@@ -65,10 +65,6 @@ axios.interceptors.response.use((res) => {
   return Promise.reject(error);
 });
 
-export function getbaseURL() {
-  return axios.defaults.baseURL;
-}
-
 /**
  * 返回一个Promise(发送post请求)
  * errorback是否错误回调
@@ -125,5 +121,4 @@ export default {
   _post,
   _get,
   _upload,
-  getbaseURL,
 }

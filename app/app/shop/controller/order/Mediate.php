@@ -8,9 +8,10 @@ use app\shop\model\product\Category as CategoryModel;
 use app\shop\model\auth\User as UserModel;
 use app\shop\model\order\MediateRelation as MediateRelationModel;
 use app\api\model\order\MediateInfo as MediateInfoModel;
+use app\common\model\order\MediateImage as MediateImageModel;
 use app\shop\model\notice\Notice as NoticeModel;
+use app\shop\model\file\UploadFile as UploadFileModel;
 use app\common\model\BaseModel;
-
 
 class Mediate extends Controller
 {
@@ -84,16 +85,30 @@ class Mediate extends Controller
             $query->field('user_id,nickName');
         }, 'image.file', 'info' => function ($query) {
             $query->field('id,mid,text,times,status,create_time')->order('create_time desc');
+        }, 'staff' =>  function ($query) {
+            $query->field('mid,uid');
         }]);
+        foreach ($detail->image as $vo) {
+            if (isset($vo->save_name)) {
+                if ($vo->file_type == 'image') {
+                    $vo->thumb_path =  base_url() . "shop.php/image.thumb?src=" . $vo->save_name;
+                }
+                unset($vo->save_name);
+            }
+        }
+        $staff = array_column($detail->staff->toArray(), 'uid');
+        unset($detail->staff);
+        $detail->__set('staff', $staff);
         return $this->renderSuccess('', compact('detail'));
     }
 
     /**
-     * 设置进度 
+     * 设置进度
      * 0 未选择调解方式
-     * 1 电话调解
-     * 2 律师调解
-     * 3 律师调解确认人员
+     * 1 电话调解后
+     * 2 律师调解后
+     * 3 确认人员后
+     * 4 调解失败后
      */
     public function setWay($id, $way)
     {
@@ -105,8 +120,11 @@ class Mediate extends Controller
             $model->way = $way;
             if ($way == 0) {
                 $model->status = 1;
+            } elseif ($way == 4) {
+                $model->status = 4;
             } else {
                 if ($way == 1) {
+                    (new MediateRelationModel)->where('mid', $id)->delete();
                     // 电话调解加进度
                     (new MediateInfoModel)->add([
                         'mid' => $id,
@@ -154,14 +172,14 @@ class Mediate extends Controller
     /* 调解失败 */
     public function setFail($id, $type)
     {
-        if ($this->setWay($id, 0)) {
+        if ($this->setWay($id, 4)) {
             $text = '';
             if ($type == 1) {
                 $text = '电话';
             } elseif ($type == 2) {
-                $text = '委员会';
+                $text = '调委会';
             }
-            $text .= '调解失败';
+            $text .= '调解失败，请等待下一轮调解！';
             (new NoticeModel)->sendMediateNotice($id,  $text);
             (new MediateInfoModel)->add([
                 'mid' => $id,
@@ -234,19 +252,35 @@ class Mediate extends Controller
     /* 获取WORD */
     public function getWord()
     {
-        $data = $this->getData();
+        $data = $this->postData();
         $id = $data['id'];
         $type = $data['type'];
-
+        // 案件模型
+        $mediate = new MediateModel;
+        $mediate = $mediate->detail($id);
+        // word类型
         if ($type == 1) {
             $word = "lianbiao.docx";
             $name = "立案书";
         } elseif ($type == 2) {
+            $summary = $data['summary'];
+            $process = $data['process'];
+            $agreement = $data['agreement'];
+            $mediator = $data['mediator'];
+            $closing_time = strtotime($data['closing_time']);
+            $closing_person = $data['closing_person'];
+            $mediate->update([
+                'summary' => $summary,
+                'process' => $process,
+                'agreement' => $agreement,
+                'mediator' => $mediator,
+                'closing_time' => $closing_time,
+                'closing_person' => $closing_person,
+            ]);
             $word = "jieanbiao.docx";
             $name = "结案书";
         }
         // 详情
-        $mediate = new MediateModel;
         $detail = array_merge([
             'no' => '',
             'create_time' => '',
@@ -259,7 +293,7 @@ class Mediate extends Controller
             'other_address' => '',
             'text' => '',
             'appeal' => ''
-        ], $mediate->detail($id)->append(['update_time'])->toArray());
+        ], $mediate->append(['update_time'])->toArray());
         // 分类
         $cat = [
             'name' => ''
@@ -292,6 +326,12 @@ class Mediate extends Controller
             $tmp->setValue('no', $detail['no']);
             $tmp->setValue('time', date('Y-m-d', strtotime($detail['update_time'])));
             $tmp->setValue('name', $this->store['user']['user_name']);
+            $tmp->setValue('summary', $summary);
+            $tmp->setValue('process', $process);
+            $tmp->setValue('agreement', $agreement);
+            $tmp->setValue('mediator', $mediator);
+            $tmp->setValue('closing_time', date('Y年m月d日 H:i:s', $closing_time));
+            $tmp->setValue('closing_person', $closing_person);
         }
         $fileFolder = "temp/" . BaseModel::$app_id . "/";
         // 创建文件夹
@@ -303,7 +343,9 @@ class Mediate extends Controller
         $fileName = "{$detail['no']}-{$name}.docx";
         $fileUrl = $fileFolder . $fileName;
         $tmp->saveAs($fileUrl);
-        return redirect(base_url() . $fileUrl);
+        return $this->renderSuccess('', [
+            'url' => base_url() . $fileUrl
+        ]);
     }
 
     /* 添加进度 */
@@ -346,5 +388,36 @@ class Mediate extends Controller
             return $this->renderError($model->getError() ?: '删除失败');
         }
         return $this->renderSuccess('删除成功');
+    }
+
+    /* 删除附件 */
+    public function delImage($id)
+    {
+        $mediateImage = MediateImageModel::where('id', $id)->find();
+        // 验证权限
+        $user = $this->store['user'];
+        if ($user['role'] == 1 || $user['role'] == 2) {
+            $mediateRelation = MediateRelationModel::where('mid', $mediateImage->mid)->count();
+            if ($mediateRelation == 0) {
+                return $this->renderError('删除失败');
+            }
+        }
+        // 删除本地文件
+        (new UploadFileModel)->remove([$mediateImage->image_id]);
+        // 删除数据库记录
+        if (!$mediateImage->delete()) {
+            return $this->renderError($mediateImage->getError() ?: '删除失败');
+        }
+        return $this->renderSuccess('删除成功');
+    }
+
+    /*允许编辑一次附件*/
+    public function allowEdit($id)
+    {
+        $model = new MediateModel();
+        if (!$model->allowEdit($id, 1)) {
+            return $this->renderError($model->getError() ?: '操作失败');
+        }
+        return $this->renderSuccess('操作成功');
     }
 }

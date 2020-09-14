@@ -105,7 +105,7 @@ class Notice extends NoticeModel
     public function send($param)
     {
         $params = array_merge([], $param);
-        $notice = $this->field('admin_unread')->where('id', $params['nid'])->find();
+        $notice = $this->field('user_unread,admin_unread')->where('id', $params['nid'])->find();
         if (!$notice) {
             return '未找到此消息';
         }
@@ -118,8 +118,12 @@ class Notice extends NoticeModel
                 'app_id' => self::$app_id
             ]);
             if ($data) {
-                // 增加后台未读消息数
-                $notice->admin_unread += 1;
+                // 增加未读消息数
+                if($param['uid'] == 0){
+                    $notice->user_unread += 1;
+                }else{
+                    $notice->admin_unread += 1;
+                }
                 $notice->save();
             }
             return $data;

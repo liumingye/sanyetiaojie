@@ -2,9 +2,9 @@
   <div style="height: calc(100vh - 160px);">
     <el-row style="height: 100%;" v-loading="loading">
       <el-col :lg="{span: 12, offset: 6}" style=" height: 100%;display: flex;flex-direction: column;">
-        <el-page-header @back="cancelFunc" :content="title" style="padding-bottom: 18px;"></el-page-header>
+        <el-page-header @back="cancelFunc" :content="title" style="padding-bottom: 16px;"></el-page-header>
         <div id="dataShow" :class="[browser==='Chrome'? 'dataShowCM': 'dataShowFF']">
-          <el-button v-if="radioInfoList.current_page * radioInfoList.per_page < radioInfoList.total" type="text" style="text-align: center;display: block;width: 100%;" @click="loadMore" v-loading="loading">加载更多...</el-button>
+          <el-button v-if="radioInfoList.current_page * radioInfoList.per_page < radioInfoList.total" type="text" style="text-align: center;display: block;width: 100%;padding-top: 0;" @click="loadMore" v-loading="loading">加载更多...</el-button>
           <div v-for="(item,index) in radioInfoList.data" :key="index" style="background-color: #f5f5f5; padding:0 24px 16px;">
             <el-row v-if="item.is_user==0">
               <el-row style="margin-bottom: 16px" v-if="(index != 0 && new Date(radioInfoList.data[index].create_time).getTime() - new Date(radioInfoList.data[index - 1].create_time).getTime() > 60000) || index == 0">
@@ -226,7 +226,7 @@
     flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
-    padding: 8px 0;
+    padding: 16px 0 8px;
     background-color: #f5f5f5;
     scrollbar-width: none;
   }
@@ -236,7 +236,7 @@
     flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
-    padding: 8px 0;
+    padding: 16px 0 8px;
     background-color: #f5f5f5;
   }
 

@@ -27,6 +27,7 @@
           <el-tab-pane label="全部案件" name="all"></el-tab-pane>
           <el-tab-pane :label="'待受理(' + order_count.accepting + ')'" name="accepting"></el-tab-pane>
           <el-tab-pane :label="'调解中(' + order_count.adjusting + ')'" name="adjusting"></el-tab-pane>
+          <el-tab-pane :label="'调解失败'" name="fail"></el-tab-pane>
           <el-tab-pane :label="'已调解'" name="adjusted"></el-tab-pane>
         </el-tabs>
         <el-table size="small" :data="tableData.data" :span-method="arraySpanMethod" style="width: 100%" v-loading="loading">

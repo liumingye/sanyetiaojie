@@ -47,7 +47,7 @@ class Apply extends Controller
                 // 加进度
                 (new MediateInfoModel)->add([
                     'mid' => $model->id,
-                    'text' => '待调解',
+                    'text' => '待调解中，请耐心等待！',
                     'status' => 1,
                 ]);
                 // 发消息
@@ -68,9 +68,8 @@ class Apply extends Controller
                 // 发系统消息
                 (new NoticeModel)->sendSystemNotice($data['uid'], '您有一个纠纷待调解');
                 return $this->renderSuccess('', '提交成功');
-            } else {
-                return $this->renderError('提交失败');
             }
+            return $this->renderError('提交失败');
         } catch (ValidateException $e) {
             // 验证失败 输出错误信息
             return $this->renderError($e->getError());

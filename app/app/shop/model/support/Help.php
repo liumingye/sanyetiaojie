@@ -13,6 +13,14 @@ class Help extends HelpModel
         'app_id',
         'update_time',
     ];
+    
+    /**
+     * 关联人员表
+     */
+    public function staff()
+    {
+        return $this->hasMany('app\\shop\\model\\support\\HelpRelation', 'hid', 'id');
+    }
 
     public function getList($type, $params = null, $role = 0)
     {
@@ -36,6 +44,9 @@ class Help extends HelpModel
                 break;
             case 'adjusted';
                 $filter['status'] = 3;
+                break;
+            case 'fail';
+                $filter['status'] = 4;
                 break;
         }
         // 获取数据列表

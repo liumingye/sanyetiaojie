@@ -134,6 +134,15 @@ class Upload extends Controller
         // 存储域名
         $fileUrl = isset($this->config['engine'][$storage]['domain'])
             ? $this->config['engine'][$storage]['domain'] : '';
+        // 真实名称
+        if (isset($parmas['real_name'])) {
+            $parmas['real_name'] = htmlspecialchars(trim($parmas['real_name']));
+            if ($parmas['real_name'] == '') {
+                $parmas['real_name'] = $fileInfo->getOriginalName();
+            }
+        } else {
+            $parmas['real_name'] = $fileInfo->getOriginalName();
+        }
         // 添加文件库记录
         $model = new UploadFileModel;
         $model->add([
@@ -144,7 +153,7 @@ class Upload extends Controller
             'file_size' => $fileInfo->getSize(),
             'file_type' => $fileType,
             'extension' => $fileInfo->getOriginalExtension(),
-            'real_name' => $fileInfo->getOriginalName(),
+            'real_name' => $parmas['real_name'],
             'is_user' => 1,
             'app_id' => $parmas['app_id']
         ]);

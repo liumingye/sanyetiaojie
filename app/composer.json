@@ -28,7 +28,8 @@
         "qcloud/cos-sdk-v5": "^2.0",
         "kosinix/grafika": "dev-master",
         "endroid/qrcode": "^3.7",
-        "phpoffice/phpword": "^0.17.0"
+        "phpoffice/phpword": "^0.17.0",
+        "topthink/think-image": "^1.0"
     },
     "require-dev": {
         "symfony/var-dumper": "^4.2",

@@ -2,7 +2,7 @@
   <el-dialog title="添加进度" :visible.sync="dialogVisible" @close="dialogFormVisible" :close-on-click-modal="false" :close-on-press-escape="false" width="50%">
     <el-form size="small" :model="form" ref="form">
       <el-form-item label="文本描述" :label-width="formLabelWidth" prop="text" :rules="[{required: true,message: ' '}]">
-        <el-input v-model="form.text" autocomplete="off"></el-input>
+        <el-input type="textarea" :autosize="{ minRows: 4}" v-model="form.text" autocomplete="off"></el-input>
       </el-form-item>
       <el-form-item label="进度状态" :label-width="formLabelWidth" prop="status" :rules="[{required: true,message: ' '}]">
         <el-select v-model="form.status" placeholder="请选择">

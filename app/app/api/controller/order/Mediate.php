@@ -4,9 +4,41 @@ namespace app\api\controller\order;
 
 use app\api\controller\Controller;
 use app\api\model\order\Mediate as MediateModel;
+use app\api\validate\order\AddImage as AddImageValidate;
+use app\api\validate\order\Edit as EditValidate;
+use think\exception\ValidateException;
 
 class Mediate extends Controller
 {
+
+    public function addImage()
+    {
+        if (!request()->isPost()) {
+            return $this->renderError('请求错误');
+        }
+        $user = $this->getUser(false);
+        if (!$user['user_id']) {
+            return $this->renderError('请先登录');
+        }
+        $data = [
+            'id' => request()->param('id', '', 'intval'),
+            'uid' => $user['user_id'],
+            'iFile' => request()->param('iFile', '', 'htmlspecialchars'),
+        ];
+        try {
+            validate(AddImageValidate::class)->check($data);
+            $model = new MediateModel;
+            if ($model->addImage($data)) {
+                return $this->renderSuccess('', '提交成功');
+            }
+            return $this->renderError('提交失败');
+        } catch (ValidateException $e) {
+            // 验证失败 输出错误信息
+            return $this->renderError($e->getError());
+        }
+        return $this->renderError('未知错误');
+    }
+
     public function list()
     {
         $phone = input('phone', '', 'htmlspecialchars');
@@ -36,5 +68,40 @@ class Mediate extends Controller
             return $this->renderError('未找到此案件');
         }
         return $this->renderError('缺少参数');
+    }
+
+    public function edit()
+    {
+        if (!request()->isPost()) {
+            return $this->renderError('请求错误');
+        }
+        $user = $this->getUser(false);
+        if (!$user['user_id']) {
+            return $this->renderError('请先登录');
+        }
+        $id = request()->param('id', '', 'intval');
+        $no = request()->param('no', '', 'intval');
+        if ($id == '' || $no == '') {
+            return $this->renderError('缺少参数');
+        }
+        $data = [
+            'id' => $id,
+            'no' => $no,
+            'uid' => $user['user_id'],
+            'iFile' => request()->param('iFile', '', 'htmlspecialchars'),
+        ];
+        try {
+            validate(EditValidate::class)->check($data);
+            $model = new MediateModel;
+            unset($data['id'], $data['no'], $data['uid']);
+            if ($model->edit(['id' => $id, 'no' => $no], $data)) {
+                return $this->renderSuccess('', '提交成功');
+            }
+            return $this->renderError($model->getError() ?: '删除失败');
+        } catch (ValidateException $e) {
+            // 验证失败 输出错误信息
+            return $this->renderError($e->getError());
+        }
+        return $this->renderError('未知错误');
     }
 }

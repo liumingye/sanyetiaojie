@@ -6,6 +6,7 @@ use app\shop\model\user\User;
 use app\shop\model\order\Mediate;
 use app\shop\model\user\Feedback;
 use app\shop\model\support\Help;
+use app\shop\model\notice\Notice;
 
 /**
  * 三叶模型
@@ -16,6 +17,7 @@ class ShopService
     private $HelpModel;
     private $FeedbackModel;
     private $UserModel;
+    private $NoticeModel;
 
     /**
      * 构造方法
@@ -27,6 +29,7 @@ class ShopService
         $this->HelpModel = new Help();
         $this->FeedbackModel = new Feedback();
         $this->UserModel = new User();
+        $this->NoticeModel = new Notice();
     }
 
     /**
@@ -51,19 +54,31 @@ class ShopService
                 ],
 
             ],
-            'right_away' => []
+            'right_away' => [
+                'mediate' => $this->getMediateTotal(1),
+                'help' => $this->getHelpTotal(1),
+                'notice' => $this->getNoticeTotal(1)
+            ]
         ];
         return $data;
     }
 
-    private function getMediateTotal()
+    private function getMediateTotal($type = null)
     {
-        return number_format($this->MediateModel->getMediateTotal());
+        $where = [];
+        if ($type == 1) {
+            $where = ['status' => 1];
+        }
+        return number_format($this->MediateModel->getMediateTotal($where));
     }
 
-    private function getHelpTotal()
+    private function getHelpTotal($type = null)
     {
-        return number_format($this->HelpModel->getHelpTotal());
+        $where = [];
+        if ($type == 1) {
+            $where = ['status' => 1];
+        }
+        return number_format($this->HelpModel->getHelpTotal($where));
     }
 
     private function getFeedbackTotal()
@@ -74,6 +89,11 @@ class ShopService
     private function getUserTotal($day = null)
     {
         return number_format($this->UserModel->getUserTotal($day));
+    }
+
+    private function getNoticeTotal($type = null)
+    {
+        return number_format($this->NoticeModel->getNoticeTotal($type));
     }
 
     /**

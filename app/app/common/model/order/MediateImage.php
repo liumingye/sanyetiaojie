@@ -3,6 +3,8 @@
 namespace app\common\model\order;
 
 use app\common\model\BaseModel;
+use app\common\library\storage\Driver as StorageDriver;
+use app\api\model\settings\Setting as SettingModel;
 
 class MediateImage extends BaseModel
 {
@@ -25,6 +27,7 @@ class MediateImage extends BaseModel
     public function file()
     {
         return $this->belongsTo('app\\common\\model\\file\\UploadFile', 'image_id', 'file_id')
-            ->bind(['file_path', 'file_type']);
+            ->bind(['file_path', 'file_type', 'save_name', 'real_name']);
     }
+
 }

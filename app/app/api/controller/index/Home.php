@@ -12,7 +12,8 @@ class Home extends Controller
         // 5条新闻
         $news = (new NewsModel)->getList([
             'list_rows' => 5,
-            'field' => 'id,title'
+            'field' => 'id,title',
+            'status' => 1
         ]);
         return $this->renderSuccess('', compact('news'));
     }

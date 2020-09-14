@@ -15,7 +15,7 @@
           <span class="ml4">
             <Icon :iconname="'#icon-geren9'"></Icon>
           </span>
-          <span class="text ml4">{{ baseInfo.user.user_name }}，欢迎您！</span>
+          <span class="text ml4">太湖街道一码解忧，欢迎您！{{ baseInfo.user.user_name }}</span>
         </div>
         <div class="header-navbar-icon"><span class="y-line"></span></div>
         <!--修改密码-->

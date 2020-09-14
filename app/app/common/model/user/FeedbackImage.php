@@ -25,6 +25,6 @@ class FeedbackImage extends BaseModel
     public function file()
     {
         return $this->belongsTo('app\\common\\model\\file\\UploadFile', 'image_id', 'file_id')
-            ->bind(['file_path', 'file_type']);
+            ->bind(['file_path', 'file_type', 'save_name']);
     }
 }

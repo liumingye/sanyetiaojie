@@ -3,14 +3,15 @@
     <!--搜索表单-->
     <div class="common-seach-wrap">
       <el-form size="small" :inline="true" :model="formInline" class="demo-form-inline">
-        <el-form-item label="用户名"><el-input v-model="formInline.nick_name" placeholder="请输入用户名"></el-input></el-form-item>
+        <el-form-item label="昵称"><el-input v-model="formInline.nick_name" placeholder="请输入昵称"></el-input></el-form-item>
+        <el-form-item label="用户ID"><el-input v-model="formInline.id" placeholder="请输入用户ID"></el-input></el-form-item>
         <el-form-item label="注册时间">
           <div class="block">
             <span class="demonstration"></span>
             <el-date-picker v-model="formInline.value1" type="daterange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期"></el-date-picker>
           </div>
         </el-form-item>
-        <el-form-item><el-button type="primary" @click="onSubmit">查询</el-button></el-form-item>
+        <el-form-item><el-button type="primary" @click="onSubmit" icon="el-icon-search">查询</el-button></el-form-item>
       </el-form>
     </div>
     <!--内容-->
@@ -19,7 +20,7 @@
         <el-table :data="tableData" size="small" style="width: 100%" v-loading="loading">
           <el-table-column prop="user_id" label="ID" width="80"></el-table-column>
           <el-table-column prop="nickName" label="昵称"></el-table-column>
-          <el-table-column prop="nickName" label="头像">
+          <el-table-column prop="nickName" label="微信头像">
             <template slot-scope="scope">
               <img :src="scope.row.avatarUrl" width="30px" height="30px" />
             </template>
@@ -77,6 +78,7 @@ export default {
       /*横向表单数据模型*/
       formInline: {
         nick_name: '',
+        id: '',
         value1: ''
       },
       /*时间*/

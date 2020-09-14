@@ -7,7 +7,9 @@ use app\shop\model\support\Help as HelpModel;
 use app\shop\model\product\Category as CategoryModel;
 use app\shop\model\notice\Notice as NoticeModel;
 use app\shop\model\support\HelpRelation as HelpRelationModel;
+use app\common\model\support\HelpImage as HelpImageModel;
 use app\shop\model\auth\User as UserModel;
+use app\shop\model\file\UploadFile as UploadFileModel;
 
 class Help extends Controller
 {
@@ -70,7 +72,20 @@ class Help extends Controller
     {
         $detail = HelpModel::detail($id, ['user' => function ($query) {
             $query->field('user_id,nickName');
-        }, 'image.file']);
+        }, 'image.file', 'staff' =>  function ($query) {
+            $query->field('hid,uid');
+        }]);
+        foreach ($detail->image as $vo) {
+            if (isset($vo->save_name)) {
+                if ($vo->file_type == 'image') {
+                    $vo->thumb_path =  base_url() . "shop.php/image.thumb?src=" . $vo->save_name;
+                }
+                unset($vo->save_name);
+            }
+        }
+        $staff = array_column($detail->staff->toArray(), 'uid');
+        unset($detail->staff);
+        $detail->__set('staff', $staff);
         return $this->renderSuccess('', compact('detail'));
     }
 
@@ -177,5 +192,26 @@ class Help extends Controller
         } else {
             return $this->renderError('提交失败');
         }
+    }
+
+    /* 删除附件 */
+    public function delImage($id)
+    {
+        $helpImage = HelpImageModel::where('id', $id)->find();
+        // 验证权限
+        $user = $this->store['user'];
+        if ($user['role'] == 1 || $user['role'] == 2) {
+            $helpRelation = HelpRelationModel::where('hid', $helpImage->hid)->count();
+            if ($helpRelation == 0) {
+                return $this->renderError('删除失败');
+            }
+        }
+        // 删除本地文件
+        (new UploadFileModel)->remove([$helpImage->image_id]);
+        // 删除数据库记录
+        if (!$helpImage->delete()) {
+            return $this->renderError($helpImage->getError() ?: '删除失败');
+        }
+        return $this->renderSuccess('删除成功');
     }
 }

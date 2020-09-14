@@ -6,7 +6,7 @@
         </el-col>
         <el-col :xs="24" :sm="24" :md="12" :lg="9" :xl="9" class="justify-center">
             <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-position="left" label-width="0px" class="demo-ruleForm login-container">
-                <h3 class="title" style="margin-bottom: 20px;">三叶调解</h3>
+                <h3 class="title" style="margin-bottom: 20px;">一码解忧后台管理</h3>
                 <!--用户名-->
                 <el-form-item prop="account">
                     <span class="svg-container">
@@ -42,8 +42,7 @@
 import bgimg from "@/assets/img/login/bg.jpg";
 import UserApi from "@/api/user.js";
 import {
-    setCookie,
-    setSessionStorage
+    setCookie
 } from "@/utils/base.js";
 export default {
     data() {
@@ -97,9 +96,7 @@ export default {
                                 /*设置一个登录状态*/
                                 setCookie("isLogin", true);
                                 /*跳转到首页*/
-                                this.$router.push({
-                                    path: "/"
-                                });
+                                this.$router.push({ path: '/' });
                             } else {
                                 this.$message({
                                     message: "登录失败",

@@ -44,13 +44,13 @@ class Notice extends NoticeModel
 
         // 获取数据列表
         return $model
-            ->field('id,a.uid,type,name,admin_unread as unread,create_time')
+            ->field('id,a.uid,type,name,admin_unread as unread,a.create_time,u.user_id,u.nickName')
             ->order(['id desc'])
-            ->with(['user' => function ($query) {
-                $query->field('user_id,nickName');
-            }, 'msg' => function ($query) {
+            ->rightJoin('user u', 'u.user_id=a.uid')
+            ->with(['msg' => function ($query) {
                 $query->field('nid,text,create_time')->order('create_time desc,id desc')->withLimit(1);
             }])
+            ->group('id')
             ->paginate($params, false, [
                 'query' => \request()->request(),
             ]);
