@@ -2,9 +2,7 @@
 
 namespace app\common\service\message;
 
-use app\common\enum\order\OrderTypeEnum;
 use app\common\library\easywechat\AppWx;
-use app\common\library\wechat\WxTplMsg;
 
 /**
  * 微信小程序消息通知服务

@@ -7,13 +7,6 @@ return [
         'HttpEnd' => [],
         'LogLevel' => [],
         'LogWrite' => [],
-        'PaySuccess' => [
-            \app\api\event\PaySuccess::class
-        ],
-        /*订单事件*/
-        'Order' => [
-            \app\job\event\Order::class
-        ],
     ],
 
     'subscribe' => [],

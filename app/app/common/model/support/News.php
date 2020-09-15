@@ -27,7 +27,9 @@ class News extends BaseModel
             'text' => '',
             'list_rows' => 10,
             'field' => '*',
-            'status' => 0
+            'status' => 0,
+            'where' => [['create_time', '<=', time()]],
+            'order' => 'create_time desc, id desc',
         ], $param);
         // 筛选条件
         if ($params['text'] != '') {
@@ -41,7 +43,8 @@ class News extends BaseModel
         $list = $model
             ->field($params['field'])
             ->with($with)
-            ->order('id desc')
+            ->where($params['where'])
+            ->order($params['order'])
             ->paginate($params, false, [
                 'query' => \request()->request(),
             ]);

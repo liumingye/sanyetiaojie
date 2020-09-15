@@ -37,6 +37,7 @@ class Notice extends BaseModel
         $res = (new NoticeModel)->send([
             'nid' => $nid,
             'uid' => 0,
+            'aid' => 0,
             'text' => $text
         ]);
         return $res;
@@ -53,6 +54,7 @@ class Notice extends BaseModel
         $res = (new NoticeModel)->send([
             'nid' => $nid,
             'uid' => 0,
+            'aid' => 0,
             'text' => $text
         ]);
         return $res;
@@ -66,6 +68,7 @@ class Notice extends BaseModel
                 'mid' => 0,
                 'hid' => 0,
                 'uid' => $uid,
+                'aid' => 0,
                 'type' => 1,
                 'sort' => 5,
                 'name' => '提示消息',
@@ -78,6 +81,7 @@ class Notice extends BaseModel
         $res = (new NoticeModel)->send([
             'nid' => $nid,
             'uid' => 0,
+            'aid' => 0,
             'text' => $text
         ]);
         return $res;

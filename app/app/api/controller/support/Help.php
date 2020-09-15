@@ -45,6 +45,7 @@ class Help extends Controller
                     (new NoticeModel)->send([
                         'nid' => $notice->id,
                         'uid' => 0,
+                        'aid' => 0,
                         'text' => '您的申请我们已经收到，请耐心等待。',
                     ]);
                 }

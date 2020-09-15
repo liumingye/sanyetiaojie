@@ -1,4 +1,12 @@
 <?php
+/*
+ * @Created by: VSCode
+ * @Author: LiuMingye
+ * @Date: 2020-08-29 19:56:57
+ * @LastEditTime: 2020-09-14 15:46:20
+ * @LastEditors: your name
+ * @FilePath: \app\app\common\model\order\Mediate.php
+ */
 
 namespace app\common\model\order;
 
@@ -6,7 +14,7 @@ use app\common\model\BaseModel;
 use app\common\service\order\OrderService;
 
 /**
- * 订单模型模型
+ * 案件模型
  */
 class Mediate extends BaseModel
 {

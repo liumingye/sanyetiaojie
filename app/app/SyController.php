@@ -1,12 +1,16 @@
 <?php
+/*
+ * @Created by: VSCode
+ * @Author: LiuMingye
+ * @Date: 2020-08-29 19:56:57
+ * @LastEditTime: 2020-09-14 15:48:34
+ * @LastEditors: your name
+ * @FilePath: \app\app\SyController.php
+ */
+
 declare (strict_types=1);
 
 namespace app;
-
-// use think\App;
-// use think\exception\ValidateException;
-// use think\Validate;
-// use think\Request;
 
 /**
  * 控制器基础类

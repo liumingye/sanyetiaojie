@@ -1,10 +1,21 @@
 <?php
+/*
+ * @Created by: VSCode
+ * @Author: LiuMingye
+ * @Date: 2020-09-10 13:43:44
+ * @LastEditTime: 2020-09-14 15:59:28
+ * @LastEditors: your name
+ * @FilePath: \app\app\common\extend\Image.php
+ */
 
 namespace app\common\extend;
 
 use think\image\Exception as ImageException;
 use think\Image as TpImage;
 
+/**
+ * @name: 图片缩略图类
+ */
 class Image extends TpImage
 {
 

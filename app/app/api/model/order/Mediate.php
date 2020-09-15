@@ -1,4 +1,12 @@
 <?php
+/*
+ * @Created by: VSCode
+ * @Author: LiuMingye
+ * @Date: 2020-08-29 19:56:57
+ * @LastEditTime: 2020-09-15 12:54:38
+ * @LastEditors: your name
+ * @FilePath: \app\app\api\model\order\Mediate.php
+ */
 
 namespace app\api\model\order;
 
@@ -10,6 +18,7 @@ class Mediate extends MediateModel
 
     protected $type = [
         'create_time'    =>  'timestamp:Y-m-d',
+        'court_time'    =>  'timestamp:Y-m-d H:i:s',
     ];
 
     /**
@@ -163,7 +172,7 @@ class Mediate extends MediateModel
         $model = $model->where(['id' => trim($id), 'no' => trim($no)]);
         // 获取数据列表
         $data = $model
-            ->field('id,cid,no,name,mobile,idcard,my_area,my_address,appeal,other_name,other_phone,other_area,other_address,text,area,address,times,allow_edit,create_time,status')
+            ->field('id,cid,no,name,mobile,idcard,my_area,my_address,appeal,other_name,other_phone,other_area,other_address,text,area,address,times,allow_edit,court_time,court_address,create_time,status')
             ->with(['info' => function ($query) {
                 $query->field('mid,text,times,status,create_time')->order('create_time desc');
             },  'image.file', 'category' => function ($query) {

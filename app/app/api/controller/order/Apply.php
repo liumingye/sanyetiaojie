@@ -1,4 +1,12 @@
 <?php
+/*
+ * @Created by: VSCode
+ * @Author: LiuMingye
+ * @Date: 2020-08-29 19:56:57
+ * @LastEditTime: 2020-09-15 14:10:44
+ * @LastEditors: your name
+ * @FilePath: \app\app\api\controller\order\Apply.php
+ */
 
 namespace app\api\controller\order;
 
@@ -54,6 +62,7 @@ class Apply extends Controller
                 $notice =  (new NoticeModel)->add([
                     'mid' => $model->id,
                     'hid' => 0,
+                    'aid' => 0,
                     'type' => 3,
                     'uid' => $data['uid'],
                     'name' => mb_substr($data['text'], 0, 20)
@@ -62,6 +71,7 @@ class Apply extends Controller
                     (new NoticeModel)->send([
                         'nid' => $notice->id,
                         'uid' => 0,
+                        'aid' => 0,
                         'text' => '您的申请我们已经收到，请耐心等待。',
                     ]);
                 }

@@ -5,7 +5,6 @@ namespace app\shop\service;
 use app\common\service\product\BaseProductService;
 use app\shop\model\product\Category as CategoryModel;
 use app\shop\model\settings\Delivery as DeliveryModel;
-use app\shop\model\user\Grade as GradeModel;
 use app\shop\service\product\ApplyService;
 
 /**

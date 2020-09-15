@@ -6,12 +6,17 @@ use app\common\model\support\News as NewsModel;
 
 class News extends NewsModel
 {
+
     /**
      * 隐藏字段
      */
     protected $hidden = [
         'app_id',
         'update_time',
+    ];
+
+    protected $type = [
+        'create_time'    =>  'timestamp:Y-m-d H:i:s',
     ];
 
     /**
@@ -48,10 +53,10 @@ class News extends NewsModel
     {
         $data['app_id'] = self::$app_id;
         return $this->transaction(function () use ($data) {
-            // 保存商品
+            // 保存
+            $this->createTime = false;
             $this->save($data);
             return true;
         });
     }
-
 }

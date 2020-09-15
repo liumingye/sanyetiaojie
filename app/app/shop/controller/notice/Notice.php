@@ -29,12 +29,13 @@ class Notice extends Controller
         if ($id > 0) {
             $data = (new NoticeModel)->info([
                 'id' => $id,
+                'aid' => $this->store['user']['shop_user_id'],
             ]);
             if (!is_string($data)) {
-                // 用户未读消息置0
-                NoticeModel::find($id)->isAutoWriteTimestamp(false)->save([
+                // 未读消息置0
+                /*NoticeModel::find($id)->isAutoWriteTimestamp(false)->save([
                     'admin_unread' => 0
-                ]);
+                ]);*/
                 return $this->renderSuccess('', compact('data'));
             }
             return $this->renderError($data);
@@ -53,15 +54,21 @@ class Notice extends Controller
             if ($text == '') {
                 return $this->renderError('请输入文字');
             }
-            $data = (new NoticeModel)->send([
+            $model = new NoticeModel;
+            $res = $model->send([
                 'uid' => 0,
+                'aid' => $this->store['user']['shop_user_id'],
                 'nid' => $id,
                 'text' => $text,
             ]);
-            if (!is_string($data)) {
-                return $this->renderSuccess('', $data);
+            if ($res) {
+                // 客户要发送的时候置0 未读消息置0
+                NoticeModel::find($id)->isAutoWriteTimestamp(false)->save([
+                    'admin_unread' => 0
+                ]);
+                return $this->renderSuccess('', $res);
             }
-            return $this->renderError($data);
+            return $this->renderError($model->getError() ?: '发送失败');
         }
         return $this->renderError('参数错误');
     }

@@ -116,7 +116,7 @@ class Help extends Controller
             return $this->renderError('请设置人员');
         }
         if (count($role1) > 0 || count($role2) > 0) {
-            // 律师调解加进度
+            // 发送消息
             $text = '';
             if (count($role1) > 0) {
                 $text .= '调解员：' . implode(",", $role1);
@@ -127,7 +127,7 @@ class Help extends Controller
                 }
                 $text .= '律师：' . implode(",", $role2);
             }
-            $text =  '已分配 ' . $text . ' 负责此案件调解';
+            $text =  '已分配 ' . $text . ' 负责此问题处理';
             (new NoticeModel)->sendHelpNotice($id,  $text);
         }
         $this->setWay($id, 3);
@@ -144,8 +144,8 @@ class Help extends Controller
         if ($model) {
             $model->status = 3;
             if ($model->save()) {
-                (new NoticeModel)->sendSystemNotice($model->uid, '您有一个纠纷已调解成功');
-                (new NoticeModel)->sendHelpNotice($id,  '案件已调解成功');
+                (new NoticeModel)->sendSystemNotice($model->uid, '您有一个问题已处理成功');
+                (new NoticeModel)->sendHelpNotice($id,  '问题已处理成功');
                 return $this->renderSuccess('提交成功');
             }
             return $this->renderError($model->getError() ?: '提交失败');
@@ -183,7 +183,7 @@ class Help extends Controller
                 $model->status = 1;
             } else {
                 $model->status = 2;
-                (new NoticeModel)->sendSystemNotice($model->uid, '您有一个纠纷正在调解中');
+                (new NoticeModel)->sendSystemNotice($model->uid, '您有一个问题正在处理中');
             }
             if ($model->save()) {
                 return $this->renderSuccess('提交成功');

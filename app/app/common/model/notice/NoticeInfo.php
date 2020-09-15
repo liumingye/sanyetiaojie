@@ -28,6 +28,14 @@ class NoticeInfo extends BaseModel
         return $this->belongsTo("app\\common\\model\\user\\User", 'uid', 'user_id');
     }
 
+    /**
+     * 关联管理员账户
+     */
+    public function adminUser()
+    {
+        return $this->belongsTo("app\\common\\model\\shop\\User", 'aid', 'shop_user_id');
+    }
+
     public function add($param)
     {
         $params = array_merge([], $param);
@@ -40,6 +48,7 @@ class NoticeInfo extends BaseModel
             $data = $model->save([
                 'nid' => $param['nid'],
                 'uid' => $param['uid'],
+                'aid' => $param['aid'],
                 'text' => $param['text'],
                 'app_id' => self::$app_id
             ]);

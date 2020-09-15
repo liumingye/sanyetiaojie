@@ -1,4 +1,12 @@
 <?php
+/*
+ * @Created by: VSCode
+ * @Author: LiuMingye
+ * @Date: 2020-08-29 19:56:57
+ * @LastEditTime: 2020-09-14 15:50:47
+ * @LastEditors: your name
+ * @FilePath: \app\app\common.php
+ */
 
 use think\facade\Log;
 use think\facade\Request;
@@ -227,7 +235,9 @@ function jsonRecursive(&$array)
 }
 
 /**
- * 时间戳翻译
+ * @name: 时间戳翻译
+ * @param $time
+ * @return string $time
  */
 function time_tran($time)
 {

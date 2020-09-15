@@ -2,10 +2,7 @@
 
 namespace app\common\service\message;
 
-use app\common\enum\order\OrderTypeEnum;
-use app\common\library\easywechat\AppMp;
 use app\common\library\sms\Driver as SmsDriver;
-use app\common\library\wechat\WxTplMsg;
 use app\common\model\settings\Setting as SettingModel;
 
 /**

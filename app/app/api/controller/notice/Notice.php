@@ -4,6 +4,8 @@ namespace app\api\controller\notice;
 
 use app\api\controller\Controller;
 use app\api\model\notice\Notice as NoticeModel;
+use app\api\validate\notice\Send as SendValidate;
+use think\exception\ValidateException;
 
 class Notice extends Controller
 {
@@ -58,20 +60,24 @@ class Notice extends Controller
         }
         $id = input('id', 0, 'intval');
         $text = input('text', '', 'htmlspecialchars');
-        if ($id > 0) {
-            if ($text == '') {
-                return $this->renderError('请输入文字');
+        $data = [
+            'nid' => $id,
+            'uid' => $user['user_id'],
+            'aid' => 0,
+            'text' => $text,
+        ];
+        try {
+            validate(SendValidate::class)->check($data);
+            $model = new NoticeModel;
+            $res = $model->send($data);
+            if ($res) {
+                return $this->renderSuccess('', $res);
             }
-            $data = (new NoticeModel)->send([
-                'nid' => $id,
-                'uid' => $user['user_id'],
-                'text' => $text,
-            ]);
-            if (!is_string($data)) {
-                return $this->renderSuccess('', $data);
-            }
-            return $this->renderError($data);
+            return $this->renderError($model->getError() ?: '发送失败');
+        } catch (ValidateException $e) {
+            // 验证失败 输出错误信息
+            return $this->renderError($e->getError());
         }
-        return $this->renderError('参数错误');
+        return $this->renderError('未知错误');
     }
 }

@@ -60,6 +60,7 @@ class Notice extends NoticeModel
     {
         $params = array_merge([
             'list_rows' => 20,
+            'aid' => 0
         ], $param);
         $notice = $this->field('uid')->where('id', $params['id'])->find();
         if (!$notice) {
@@ -67,9 +68,11 @@ class Notice extends NoticeModel
         }
         $model = new NoticeInfoModel;
         $list = $model
-            ->field('id,uid,text,create_time')
+            ->field('id,uid,aid,text,create_time')
             ->with(['user' => function ($query) {
                 $query->field('user_id,nickName,avatarUrl');
+            }, 'admin_user' => function ($query) {
+                $query->field('shop_user_id,real_name');
             }])
             ->where(['nid' => $params['id'], 'is_delete' => 0])
             ->order('update_time desc,id desc')
@@ -77,21 +80,21 @@ class Notice extends NoticeModel
                 'query' => \request()->request(),
             ]);
         foreach ($list as &$vo) {
-            if ($vo['uid']) {
-                $vo['is_user'] = 1;
-            } else {
+            if ($vo['aid'] == $params['aid']) {
                 $vo['is_user'] = 0;
-                if ($vo['uid'] == 0) {
-                    $vo['user'] = [
-                        'nickName' => '系统',
-                    ];
-                }
+            } else {
+                $vo['is_user'] = 1;
             }
-            if (isset($vo['user']['user_id'])) {
-                unset($vo['user']['user_id']);
+            if ($vo['uid'] == 0 && $vo['aid'] == 0) {
+                $vo['user'] = [
+                    'nickName' => '系统',
+                ];
+            } elseif ($vo['aid'] != 0) {
+                $vo['user'] = [
+                    'nickName' => $vo['admin_user']['real_name'],
+                ];
             }
-            unset($vo['id']);
-            unset($vo['uid']);
+            unset($vo->id, $vo->uid, $vo->aid, $vo->admin_user);
         }
         $list = $list->toArray();
         $list['data'] = array_reverse($list['data']);
@@ -107,11 +110,13 @@ class Notice extends NoticeModel
         if (!$notice) {
             return '未找到此消息';
         }
+        $this->startTrans();
         try {
             $model = new NoticeInfoModel;
             $data = $model->save([
                 'nid' => $param['nid'],
                 'uid' => $param['uid'],
+                'aid' => $param['aid'],
                 'text' => $param['text'],
                 'app_id' => self::$app_id
             ]);
@@ -120,9 +125,12 @@ class Notice extends NoticeModel
                 $notice->user_unread += 1;
                 $notice->save();
             }
+            $this->commit();
             return $data;
         } catch (\Exception $e) {
-            return (string) $e->getMessage();
+            $this->error = $e->getMessage();
+            $this->rollback();
+            return false;
         }
     }
 }

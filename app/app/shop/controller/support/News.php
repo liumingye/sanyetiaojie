@@ -18,7 +18,9 @@ class News extends Controller
             'text' => $text,
             'page' => $page,
             'list_rows' => 10,
-            'field' => 'id,title,author,source,create_time'
+            'field' => 'id,title,author,source,create_time',
+            'where' => [],
+            'order' => 'id desc',
         ]);
 
         return $this->renderSuccess('', $list);
